@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/owner_dashboard_navigation"
+    app:startDestination="@id/navigation_dashboard">
+
+    <fragment
+        android:id="@+id/navigation_catatan"
+        android:name="com.ubaya.kost.ui.owner.catatan.CatatanFragment"
+        tools:layout="@layout/fragment_catatan"
+        android:label="Catatan" />
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.ubaya.kost.ui.owner.dashboard.DashboardFragment"
+        tools:layout="@layout/fragment_dashboard"
+        android:label="Dashboard">
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_notifications"
+            app:destination="@id/navigation_notifications" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_chats"
+            app:destination="@id/navigation_chats" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_catatan"
+            app:destination="@id/navigation_catatan" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_add_tenant"
+            app:destination="@id/navigation_add_tenant" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_navigation_detal_tenant"
+            app:destination="@id/navigation_detail_tenant" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_add_tenant"
+        android:name="com.ubaya.kost.ui.owner.dashboard.AddTenantFragment"
+        tools:layout="@layout/fragment_add_tenant"
+        android:label="Add Tenant" />
+    <fragment
+        android:id="@+id/navigation_notifications"
+        android:name="com.ubaya.kost.ui.owner.notifications.NotificationsFragment"
+        tools:layout="@layout/fragment_notifications"
+        android:label="Notifications" />
+    <fragment
+        android:id="@+id/navigation_chats"
+        android:name="com.ubaya.kost.ui.owner.chats.ChatsFragment"
+        tools:layout="@layout/fragment_chats"
+        android:label="fragment_chats">
+        <action
+            android:id="@+id/action_navigation_chats_to_navigation_chat_room"
+            app:destination="@id/navigation_chat_room" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_chat_room"
+        android:name="com.ubaya.kost.ui.owner.chats.ChatRoomFragment"
+        tools:layout="@layout/fragment_chat_room"
+        android:label="Chat Room" />
+    <fragment
+        android:id="@+id/navigation_detail_tenant"
+        android:name="com.ubaya.kost.ui.owner.dashboard.DetailTenantFragment"
+        android:label="Detail Tenant"
+        tools:layout="@layout/fragment_detail_tenant" />
+</navigation>

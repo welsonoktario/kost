@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_catatan"
+        android:icon="@drawable/ic_round_receipt_24"
+        android:title="Catatan" />
+
+    <item
+        android:id="@+id/menu_chats"
+        android:icon="@drawable/ic_round_mail_24"
+        android:title="Chats" />
+
+    <item
+        android:id="@+id/menu_notifications"
+        android:icon="@drawable/ic_round_notifications_24"
+        android:title="Notifications" />
+</menu>
