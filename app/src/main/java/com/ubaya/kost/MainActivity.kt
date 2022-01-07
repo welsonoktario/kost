@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             setOf(
                 R.id.navigation_login,
                 R.id.navigation_dashboard,
-                R.id.navigation_service,
+                R.id.navigation_services,
                 R.id.navigation_pembukuan,
                 R.id.navigation_denda,
                 R.id.navigation_transaksi,
@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_register -> navView.visibility = View.GONE
                 R.id.navigation_catatan -> navView.visibility = View.GONE
                 R.id.navigation_chats -> navView.visibility = View.GONE
+                R.id.navigation_notifications -> navView.visibility = View.GONE
                 R.id.navigation_chat_room -> navView.visibility = View.GONE
                 R.id.navigation_detail_tenant -> navView.visibility = View.GONE
                 R.id.navigation_add_tenant -> navView.visibility = View.GONE

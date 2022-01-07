@@ -8,9 +8,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Kost(
     val id: Int,
+    val name: String,
     val address: String,
-    @SerializedName("room_count")
-    val roomCount: Int,
     val user: User
 ) : Parcelable {
     companion object {

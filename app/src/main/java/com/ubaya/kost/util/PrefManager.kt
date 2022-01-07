@@ -2,9 +2,10 @@ package com.ubaya.kost.util
 
 import android.content.Context
 import androidx.core.content.edit
+import com.google.gson.Gson
 import com.ubaya.kost.data.models.User
 
-class PrefManager private constructor(context: Context) {
+class PrefManager constructor(context: Context) {
 
     private val pref = context.getSharedPreferences("APP", Context.MODE_PRIVATE)
 
@@ -13,8 +14,8 @@ class PrefManager private constructor(context: Context) {
         set(token) = pref.edit { putString("AUTH_TOKEN", token) }
 
     var authUser: User?
-        get() = pref.getString("AUTH_USER", "")?.let { Gson.gson.fromJson(it, User::class.java) }
-        set(user) = pref.edit { putString("AUTH_USER", Gson.gson.toJson(user)) }
+        get() = pref.getString("AUTH_USER", "")?.let { Gson().fromJson(it, User::class.java) }
+        set(user) = pref.edit { putString("AUTH_USER", Gson().toJson(user)) }
 
     fun clear() = pref.edit { clear() }
 
