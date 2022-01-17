@@ -62,14 +62,14 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
 
         binding.registerBtnJenis.setOnClickListener {
             val roomType = RoomType()
-            roomTypes.add(roomType)
-            roomTypeAdapter.notifyItemInserted(roomTypes.indexOf(roomType))
+            roomTypes.add(0, roomType)
+            roomTypeAdapter.notifyItemInserted(0)
         }
 
         binding.registerBtnService.setOnClickListener {
             val service = Service()
-            services.add(service)
-            serviceAdapter.notifyItemInserted(services.indexOf(service))
+            services.add(0, service)
+            serviceAdapter.notifyItemInserted(0)
         }
 
         binding.registerBtnDaftar.setOnClickListener {
@@ -151,7 +151,7 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
                 findNavController().navigate(R.id.action_navigation_register_to_owner_navigation)
             },
             { err ->
-                Log.d("error", String(err.networkResponse.data))
+                Log.d("error", err.toString())
             }
         )
 

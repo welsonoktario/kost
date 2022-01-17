@@ -57,6 +57,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        navView.setOnItemReselectedListener { }
+
         val pref = PrefManager.getInstance(this)
 
         if (!pref.authToken.isNullOrEmpty() && pref.authUser != null) {

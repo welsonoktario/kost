@@ -22,7 +22,6 @@
         <action
             android:id="@+id/action_fragment_login_to_tenant_navigation"
             app:destination="@id/tenant_navigation"
-            app:popUpTo="@id/fragment_login"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
@@ -33,7 +32,6 @@
         <action
             android:id="@+id/action_navigation_register_to_owner_navigation"
             app:destination="@id/owner_navigation"
-            app:popUpTo="@id/fragment_login"
             app:popUpToInclusive="true" />
     </fragment>
     <include app:graph="@navigation/owner_navigation" />
