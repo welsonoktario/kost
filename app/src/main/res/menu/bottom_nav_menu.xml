@@ -2,28 +2,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/fragment_dashboard"
         android:icon="@drawable/ic_round_dashboard_24"
         android:title="Dashboard" />
 
     <item
-        android:id="@+id/navigation_services"
+        android:id="@+id/fragment_services"
         android:icon="@drawable/ic_round_ballot_24"
         android:title="Services" />
 
     <item
-        android:id="@+id/navigation_pembukuan"
+        android:id="@+id/fragment_pembukuan"
         android:icon="@drawable/ic_round_library_books_24"
         android:title="Pembukuan" />
 
     <item
-        android:id="@+id/navigation_transaksi"
+        android:id="@+id/fragment_transaksi"
         android:icon="@drawable/ic_round_receipt_24"
         android:title="Transaksi" />
 
 
     <item
-        android:id="@+id/navigation_denda"
+        android:id="@+id/fragment_denda"
         android:icon="@drawable/ic_round_warning_24"
         android:title="Denda" />
 </menu>

@@ -48,12 +48,12 @@ class LoginFragment : Fragment() {
         }
 
         binding.loginBtnRegister.setOnClickListener {
-            findNavController().navigate(R.id.action_navigation_login_to_navigation_register)
+            findNavController().navigate(R.id.action_fragment_login_to_fragment_register)
         }
     }
 
     private fun login(username: String, password: String) {
-        val url = VolleyClient.BASE_URL + "/login"
+        val url = VolleyClient.BASE_URL + "/auth/login"
         val params: Map<String, String> = hashMapOf("username" to username, "password" to password)
 
         val request = JsonObjectRequest(Request.Method.POST, url, JSONObject(params),
@@ -66,7 +66,7 @@ class LoginFragment : Fragment() {
                     authUser = user
                     authToken = token
                 }
-                findNavController().navigate(R.id.action_navigation_login_to_owner_navigation)
+                findNavController().navigate(R.id.action_fragment_login_to_owner_navigation)
             },
             { err ->
                 val data = JSONObject(String(err.networkResponse.data))

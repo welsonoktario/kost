@@ -3,29 +3,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/navigation_login">
+    app:startDestination="@id/fragment_login">
 
     <fragment
-        android:id="@+id/navigation_login"
+        android:id="@+id/fragment_login"
         android:name="com.ubaya.kost.ui.auth.login.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
         <action
-            android:id="@+id/action_navigation_login_to_navigation_register"
-            app:destination="@id/navigation_register" />
+            android:id="@+id/action_fragment_login_to_fragment_register"
+            app:destination="@id/fragment_register"
+            app:popUpTo="@id/fragment_login" />
         <action
-            android:id="@+id/action_navigation_login_to_owner_navigation"
+            android:id="@+id/action_fragment_login_to_owner_navigation"
             app:destination="@id/owner_navigation"
+            app:popUpTo="@id/fragment_login"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_navigation_login_to_tenant_navigation"
-            app:destination="@id/tenant_navigation" />
+            android:id="@+id/action_fragment_login_to_tenant_navigation"
+            app:destination="@id/tenant_navigation"
+            app:popUpTo="@id/fragment_login"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
-        android:id="@+id/navigation_register"
+        android:id="@+id/fragment_register"
         android:name="com.ubaya.kost.ui.auth.register.RegisterFragment"
         android:label="Register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_navigation_register_to_owner_navigation"
+            app:destination="@id/owner_navigation"
+            app:popUpTo="@id/fragment_login"
+            app:popUpToInclusive="true" />
+    </fragment>
     <include app:graph="@navigation/owner_navigation" />
     <include app:graph="@navigation/tenant_navigation" />
 </navigation>

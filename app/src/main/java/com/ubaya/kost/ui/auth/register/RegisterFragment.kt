@@ -1,21 +1,29 @@
 package com.ubaya.kost.ui.auth.register
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.GsonBuilder
+import com.ubaya.kost.R
 import com.ubaya.kost.data.models.Kost
 import com.ubaya.kost.data.models.RoomType
 import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.data.models.User
 import com.ubaya.kost.databinding.FragmentRegisterBinding
+import com.ubaya.kost.util.PrefManager
+import com.ubaya.kost.util.VolleyClient
+import org.json.JSONObject
 
 class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
     ServiceAdapter.CardServiceClickListener {
+
     private var _binding: FragmentRegisterBinding? = null
     private lateinit var roomTypeAdapter: RoomTypeAdapter
     private lateinit var serviceAdapter: ServiceAdapter
@@ -66,22 +74,7 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
 
         binding.registerBtnDaftar.setOnClickListener {
             if (checkForm()) {
-                val user = setUser()
-                kost = Kost(
-                    0,
-                    binding.registerInputNamaKost.text.toString(),
-                    binding.registerInputAlamatKost.text.toString(),
-                    user
-                )
-                val gson = GsonBuilder().create()
-                val params: Map<String, String> = hashMapOf(
-                    "user" to gson.toJson(user),
-                    "kost" to gson.toJson(kost),
-                    "types" to gson.toJson(roomTypes),
-                    "services" to gson.toJson(services)
-                )
-
-                Toast.makeText(requireContext(), gson.toJson(params), Toast.LENGTH_SHORT).show()
+                register()
             }
         }
     }
@@ -128,6 +121,41 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
         val phone = binding.registerInputHPUser.text.toString()
 
         return User(username, name, phone, "Owner")
+    }
+
+    private fun register() {
+        val pref = PrefManager.getInstance(requireContext())
+        kost = Kost(
+            0,
+            binding.registerInputNamaKost.text.toString(),
+            binding.registerInputAlamatKost.text.toString(),
+            setUser()
+        )
+        val gson = GsonBuilder().disableHtmlEscaping().serializeNulls().create()
+        val params: Map<String, String> = hashMapOf(
+            "kost" to gson.toJson(kost),
+            "types" to gson.toJson(roomTypes),
+            "services" to gson.toJson(services),
+            "password" to binding.registerInputPasswordUser.text.toString()
+        )
+
+        val url = VolleyClient.BASE_URL + "/auth/register"
+        val request = JsonObjectRequest(Request.Method.POST, url, JSONObject(params),
+            { res ->
+                val data = res.getJSONObject("data")
+                val user = gson.fromJson(data.get("user").toString(), User::class.java)
+                kost.user = user
+                pref.authUser = user
+                pref.authToken = data.get("token").toString()
+
+                findNavController().navigate(R.id.action_navigation_register_to_owner_navigation)
+            },
+            { err ->
+                Log.d("error", String(err.networkResponse.data))
+            }
+        )
+
+        VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
     }
 
     override fun onRemoveJenisClick(position: Int) {

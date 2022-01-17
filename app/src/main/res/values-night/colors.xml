@@ -5,8 +5,8 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-    <color name="primary">#ff6750a4</color>
-    <color name="secondary">#ff625b71</color>
+    <color name="primary">#ffd0bcff</color>
+    <color name="secondary">#ffccc2dc</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

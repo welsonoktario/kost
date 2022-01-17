@@ -27,7 +27,7 @@ class ChatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnChatRoom.setOnClickListener {
-            findNavController().navigate(R.id.action_navigation_chats_to_navigation_chat_room)
+            findNavController().navigate(R.id.action_fragment_chats_to_fragment_chat_room)
         }
     }
 }

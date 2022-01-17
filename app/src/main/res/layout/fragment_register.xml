@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
     android:scrollbars="none"
     tools:context=".ui.auth.register.RegisterFragment">
 
@@ -33,6 +34,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registerLayoutUsernameUser"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -51,6 +53,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registerLayoutNamaUser"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -67,6 +70,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registerLayoutHPUser"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -86,6 +90,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registerLayoutPasswordUser"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -102,6 +107,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registerLayoutPasswordConfirmUser"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -140,6 +146,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registerLayoutNamaKost"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -155,6 +162,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/registerLayoutAlamatKost"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -180,36 +188,22 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                 android:textSize="18sp" />
 
-            <LinearLayout
-                android:id="@+id/registerLayoutDenda"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:hint="Nominal denda"
+                app:endIconMode="none"
+                app:suffixText="/hari">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/cardRegisterJenisNama"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:layout_weight="1"
-                    android:hint="Nominal denda">
+                    android:inputType="number" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/cardRegisterJenisNama"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="per hari" />
-
-            </LinearLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
 
@@ -326,7 +320,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:text="Daftar"
             app:layout_constraintEnd_toEndOf="parent"

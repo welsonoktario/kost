@@ -15,6 +15,5 @@ data class Tenant(
     var dueDate: String?,
     var status: Boolean,
     val ktp: String,
-    val user: User,
-    val room: Room
+    val user: User
 ) : Parcelable
