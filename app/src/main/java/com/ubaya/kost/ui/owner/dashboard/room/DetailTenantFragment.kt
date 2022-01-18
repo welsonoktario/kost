@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.dashboard
+package com.ubaya.kost.ui.owner.dashboard.room
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -1,27 +1,34 @@
 package com.ubaya.kost
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.util.CoilUtils
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ubaya.kost.data.Global
 import com.ubaya.kost.databinding.ActivityMainBinding
 import com.ubaya.kost.util.PrefManager
+import okhttp3.OkHttpClient
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ImageLoaderFactory {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView
 
@@ -30,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
+        appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.fragment_login,
                 R.id.fragment_dashboard,
@@ -62,22 +69,31 @@ class MainActivity : AppCompatActivity() {
         val pref = PrefManager.getInstance(this)
 
         if (!pref.authToken.isNullOrEmpty() && pref.authUser != null) {
-            setContentView(binding.root)
+            Global.apply {
+                authUser = pref.authUser!!
+                authToken = pref.authToken!!
+            }
+
             if (pref.authUser!!.type == "Owner") {
                 navController.navigate(R.id.action_fragment_login_to_owner_navigation)
             } else {
                 navController.navigate(R.id.action_fragment_login_to_tenant_navigation)
             }
-        } else {
-            setContentView(binding.root)
         }
+
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> navController.navigateUp()
-        }
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration)
+    }
 
-        return super.onOptionsItemSelected(item)
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .okHttpClient {
+                OkHttpClient.Builder()
+                    .cache(CoilUtils.createDefaultCache(this))
+                    .build()
+            }
+            .build()
     }
 }

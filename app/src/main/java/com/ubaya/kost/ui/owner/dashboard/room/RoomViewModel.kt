@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.dashboard
+package com.ubaya.kost.ui.owner.dashboard.room
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -9,63 +9,45 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Error
-import com.ubaya.kost.data.models.Kost
 import com.ubaya.kost.data.models.Room
-import com.ubaya.kost.data.models.RoomType
+import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.util.VolleyClient
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class DashboardViewModel(private val app: Application) : AndroidViewModel(app) {
+class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
     val isLoading = MutableLiveData<Boolean>()
     val error = MutableLiveData(Error())
 
-    private val _kost = MutableLiveData<Kost>()
-    val kost: LiveData<Kost> = _kost
+    private val _room = MutableLiveData<Room>()
+    val room: LiveData<Room> = _room
 
-    private val _roomTypes = MutableLiveData<ArrayList<RoomType>>()
-    val roomTypes: LiveData<ArrayList<RoomType>> = _roomTypes
+    private val _tenant = MutableLiveData<Tenant>()
+    val tenant: LiveData<Tenant> = _tenant
 
-    private val _rooms = MutableLiveData<ArrayList<Room>>(arrayListOf())
-    val rooms: LiveData<ArrayList<Room>> = _rooms
-
-    val selectedRoomType = MutableLiveData<RoomType>()
-
-    private fun setKost(data: Kost) {
-        _kost.value = data
+    fun setRoom(room: Room) {
+        _room.value = room
     }
 
-    private fun setRoomTypes(data: ArrayList<RoomType>) {
-        _roomTypes.value = data
+    fun setTenant(tenant: Tenant) {
+        _tenant.value = tenant
     }
 
-    fun setRooms(roomType: RoomType) {
-        _rooms.value = roomTypes.value!!.find { type -> type.id == roomType.id }!!.rooms!!
-    }
-
-    fun loadData() {
+    fun loadRoom(id: Int) {
         val newError = Error(false, "")
         isLoading.value = true
         error.value = newError
 
         viewModelScope.launch {
-            val user = Global.authUser
-            val url = VolleyClient.BASE_URL + "/kosts/" + user.username
+            val url = VolleyClient.BASE_URL + "/rooms/$id"
             val request = object : JsonObjectRequest(url,
                 { res ->
                     isLoading.value = false
                     error.value = newError
 
                     val data = res.getJSONObject("data")
-                    val kost = Gson().fromJson(data.toString(), Kost::class.java)
-                    val roomTypes = Gson().fromJson<ArrayList<RoomType>>(
-                        data.getString("room_types"),
-                        RoomType.listType
-                    )
-                    kost.user = user
-                    setKost(kost)
-                    setRoomTypes(roomTypes)
-                    selectedRoomType.value = roomTypes[0]
+                    _room.value = Gson().fromJson(data.getString("room"), Room::class.java)
+                    _tenant.value = _room.value!!.tenant!!
                 },
                 { err ->
                     val data = JSONObject(String(err.networkResponse.data))
@@ -83,6 +65,34 @@ class DashboardViewModel(private val app: Application) : AndroidViewModel(app) {
             }
 
             VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
+        }
+    }
+
+    fun addTenant(params: JSONObject) {
+        val newError = Error(false, "")
+        isLoading.value = true
+        error.value = newError
+
+        viewModelScope.launch {
+            val url = VolleyClient.BASE_URL + "/tenants"
+            val request = object : JsonObjectRequest(Method.POST, url, params,
+                { res ->
+
+                },
+                { err ->
+                    val data = JSONObject(String(err.networkResponse.data))
+
+                    isLoading.value = false
+                    newError.isError = true
+                    newError.msg = data.getString("msg")
+
+                    error.value = newError
+                }
+            ) {
+                override fun getHeaders() = hashMapOf(
+                    "Authorization" to "Bearer ${Global.authToken}"
+                )
+            }
         }
     }
 }

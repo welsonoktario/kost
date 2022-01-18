@@ -11,6 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.ubaya.kost.R
+import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.User
 import com.ubaya.kost.databinding.FragmentLoginBinding
 import com.ubaya.kost.util.PrefManager
@@ -66,6 +67,12 @@ class LoginFragment : Fragment() {
                     authUser = user
                     authToken = token
                 }
+
+                Global.apply {
+                    authUser = user
+                    authToken = token
+                }
+
                 findNavController().navigate(R.id.action_fragment_login_to_owner_navigation)
             },
             { err ->

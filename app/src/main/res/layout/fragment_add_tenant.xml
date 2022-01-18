@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
     android:scrollbars="none"
-    tools:context=".ui.owner.dashboard.AddTenantFragment">
+    tools:context=".ui.owner.dashboard.room.AddTenantFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_add_tenant"
-        android:name="com.ubaya.kost.ui.owner.dashboard.AddTenantFragment"
+        android:name="com.ubaya.kost.ui.owner.dashboard.room.AddTenantFragment"
         tools:layout="@layout/fragment_add_tenant"
         android:label="Add Tenant" >
         <argument
@@ -67,7 +67,7 @@
         android:label="Chat Room" />
     <fragment
         android:id="@+id/fragment_detail_tenant"
-        android:name="com.ubaya.kost.ui.owner.dashboard.DetailTenantFragment"
+        android:name="com.ubaya.kost.ui.owner.dashboard.room.DetailTenantFragment"
         android:label="Detail Tenant"
         tools:layout="@layout/fragment_detail_tenant" >
         <argument

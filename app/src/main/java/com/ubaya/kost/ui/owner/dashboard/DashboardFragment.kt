@@ -1,6 +1,7 @@
 package com.ubaya.kost.ui.owner.dashboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
@@ -38,6 +39,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         }
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
+        Log.d("DASHBOARD", "onCreateView")
         return binding.root
     }
 
