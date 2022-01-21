@@ -1,6 +1,7 @@
 package com.ubaya.kost.ui.owner.dashboard
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -68,6 +69,7 @@ class DashboardViewModel(private val app: Application) : AndroidViewModel(app) {
                     selectedRoomType.value = roomTypes[0]
                 },
                 { err ->
+                    Log.d("ERR", String(err.networkResponse.data))
                     val data = JSONObject(String(err.networkResponse.data))
 
                     isLoading.value = false

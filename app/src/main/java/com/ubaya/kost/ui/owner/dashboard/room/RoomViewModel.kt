@@ -11,6 +11,7 @@ import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.data.models.Tenant
+import com.ubaya.kost.util.ApiInterface
 import com.ubaya.kost.util.VolleyClient
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -74,25 +75,7 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
         error.value = newError
 
         viewModelScope.launch {
-            val url = VolleyClient.BASE_URL + "/tenants"
-            val request = object : JsonObjectRequest(Method.POST, url, params,
-                { res ->
-
-                },
-                { err ->
-                    val data = JSONObject(String(err.networkResponse.data))
-
-                    isLoading.value = false
-                    newError.isError = true
-                    newError.msg = data.getString("msg")
-
-                    error.value = newError
-                }
-            ) {
-                override fun getHeaders() = hashMapOf(
-                    "Authorization" to "Bearer ${Global.authToken}"
-                )
-            }
+            ApiInterface.getInstance().addTenantToRoom()
         }
     }
 }
