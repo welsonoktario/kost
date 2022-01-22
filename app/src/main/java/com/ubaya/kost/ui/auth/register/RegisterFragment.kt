@@ -12,6 +12,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.GsonBuilder
 import com.ubaya.kost.R
+import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Kost
 import com.ubaya.kost.data.models.RoomType
 import com.ubaya.kost.data.models.Service
@@ -145,8 +146,16 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
                 val data = res.getJSONObject("data")
                 val user = gson.fromJson(data.get("user").toString(), User::class.java)
                 kost.user = user
-                pref.authUser = user
-                pref.authToken = data.get("token").toString()
+
+                pref.apply {
+                    authUser = user
+                    authToken = data.get("token").toString()
+                }
+
+                Global.apply {
+                    authUser = user
+                    authToken = data.get("token").toString()
+                }
 
                 findNavController().navigate(R.id.action_navigation_register_to_owner_navigation)
             },

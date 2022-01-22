@@ -1,6 +1,7 @@
 package com.ubaya.kost.ui.owner.dashboard.room
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,10 +12,10 @@ import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.data.models.Tenant
-import com.ubaya.kost.util.ApiInterface
 import com.ubaya.kost.util.VolleyClient
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.nio.charset.Charset
 
 class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
     val isLoading = MutableLiveData<Boolean>()
@@ -75,7 +76,40 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
         error.value = newError
 
         viewModelScope.launch {
-            ApiInterface.getInstance().addTenantToRoom()
+            val url = VolleyClient.BASE_URL + "/tenants"
+
+            val request = object : JsonObjectRequest(Method.POST, url, params,
+                { res ->
+                    Log.d("RES", res.toString())
+                    isLoading.value = false
+                    error.value = newError
+
+                    try {
+                        val room = Gson().fromJson(res.toString(), Room::class.java)
+
+                        setRoom(room)
+                    } catch (e: Exception) {
+                        Log.e("ERROR", e.message.toString())
+                    }
+                },
+                { err ->
+                    Log.e("ERROR", String(err.networkResponse.data, Charset.defaultCharset()))
+                    val data =
+                        JSONObject(String(err.networkResponse.data, Charset.defaultCharset()))
+
+                    isLoading.value = false
+                    newError.isError = true
+                    newError.msg = data.getString("msg")
+
+                    error.value = newError
+                }
+            ) {
+                override fun getHeaders() = hashMapOf(
+                    "Authorization" to "Bearer ${Global.authToken}"
+                )
+            }
+
+            VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
         }
     }
 }

@@ -25,6 +25,6 @@ class VolleyClient(context: Context) {
     }
 
     companion object : SingletonHolder<VolleyClient, Context>(::VolleyClient) {
-        const val BASE_URL = "http://192.168.1.4/kost/public/api"
+        const val BASE_URL = "http://192.168.0.195/kost/public/api"
     }
 }

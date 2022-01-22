@@ -113,16 +113,16 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
 
     private fun initDropdown(types: ArrayList<RoomType>) {
         roomTypes = types.map { type -> type.name!! }
-        binding.dashboardDropdownRoomType.setAdapter(
-            ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_dropdown_item_1line,
-                roomTypes
-            )
-        )
         binding.dashboardDropdownRoomType.apply {
+            setAdapter(
+                ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_dropdown_item_1line,
+                    roomTypes
+                )
+            )
             setSelection(0)
-            setText(roomTypes[0])
+            setText(roomTypes[0], false)
         }
 
         binding.dashboardDropdownRoomType.setOnItemClickListener { parent, view, position, id ->

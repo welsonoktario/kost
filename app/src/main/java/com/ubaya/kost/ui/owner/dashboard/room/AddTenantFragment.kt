@@ -2,12 +2,8 @@ package com.ubaya.kost.ui.owner.dashboard.room
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,31 +11,37 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import coil.load
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ubaya.kost.BuildConfig
-import com.ubaya.kost.data.models.Kost
+import com.ubaya.kost.R
 import com.ubaya.kost.databinding.FragmentAddTenantBinding
-import java.io.ByteArrayOutputStream
+import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
+import com.ubaya.kost.util.ImageUtil
+import com.ubaya.kost.util.observeOnce
+import org.json.JSONObject
 import java.io.File
-import java.io.FileInputStream
-
-private const val ARG_ROOM = "ROOM"
 
 class AddTenantFragment : Fragment() {
+    val args: AddTenantFragmentArgs by navArgs()
+
     private lateinit var ktpFile: File
     private lateinit var ktpUri: Uri
     private var _binding: FragmentAddTenantBinding? = null
-    private var kost: Kost? = null
 
     private val binding get() = _binding!!
+    private val dashboardViewModel by navGraphViewModels<DashboardViewModel>(R.id.mobile_navigation)
+    private val roomViewModel by navGraphViewModels<RoomViewModel>(R.id.mobile_navigation)
 
     private val galleryResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
             if (it != null) {
+                ktpUri = it
                 binding.addTenantImgKtp.load(it)
                 binding.addTenantImgKtp.elevation = 1.0F
 
@@ -65,13 +67,6 @@ class AddTenantFragment : Fragment() {
             }
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            kost = it.getParcelable(ARG_ROOM)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -84,6 +79,8 @@ class AddTenantFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initObserver()
+
         binding.addTenantCardFoto.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Pilih foto")
@@ -94,6 +91,13 @@ class AddTenantFragment : Fragment() {
                     }
                 }
                 .show()
+        }
+
+        binding.addTenantBtnTambah.setOnClickListener {
+            if (this::ktpUri.isInitialized) {
+                val params = prepareParams()
+                roomViewModel.addTenant(params)
+            }
         }
     }
 
@@ -125,5 +129,46 @@ class AddTenantFragment : Fragment() {
         }
 
         return FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID, ktpFile)
+    }
+
+    private fun prepareParams(): JSONObject {
+        val user = JSONObject()
+        user.put("username", binding.addTenantInputUserUsername.text.toString())
+        user.put("name", binding.addTenantInputNameUser.text.toString())
+        user.put("password", binding.addTenantInputPassUser.text.toString())
+        user.put("phone", binding.addTenantInputPhoneUser.text.toString())
+
+        val params = JSONObject()
+        params.put("room", args.room)
+        params.put("ktp", ImageUtil().contentUriToBase64(activity?.contentResolver!!, ktpUri))
+        params.put("user", user)
+
+        return params
+    }
+
+    private fun initObserver() {
+        roomViewModel.isLoading.observe(viewLifecycleOwner) {
+            binding.pbAddTenantLoading.visibility = if (it) View.VISIBLE else View.GONE
+        }
+
+        roomViewModel.error.observe(viewLifecycleOwner) {
+            if (it.isError) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(roomViewModel.error.value!!.msg)
+                    .setPositiveButton("Coba Lagi") { _, _ ->
+                        roomViewModel.addTenant(prepareParams())
+                    }.show()
+            }
+        }
+
+        roomViewModel.room.observeOnce(viewLifecycleOwner) {
+            val index =
+                dashboardViewModel.rooms.value!!.indexOf(
+                    dashboardViewModel.rooms.value!!.find { room -> room.id == args.room }
+                )
+            dashboardViewModel.rooms.value!![index] = it
+
+            findNavController().navigateUp()
+        }
     }
 }
