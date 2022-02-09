@@ -39,7 +39,6 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         }
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
-        Log.d("DASHBOARD", "onCreateView")
         return binding.root
     }
 

@@ -11,15 +11,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import coil.load
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ubaya.kost.BuildConfig
 import com.ubaya.kost.R
+import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.databinding.FragmentAddTenantBinding
 import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
 import com.ubaya.kost.util.ImageUtil
@@ -79,6 +82,10 @@ class AddTenantFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (roomViewModel.services.value == null) {
+            roomViewModel.loadServices()
+        }
+
         initObserver()
 
         binding.addTenantCardFoto.setOnClickListener {
@@ -98,6 +105,17 @@ class AddTenantFragment : Fragment() {
                 val params = prepareParams()
                 roomViewModel.addTenant(params)
             }
+        }
+    }
+
+    private fun loadServiceChip(services: ArrayList<Service>) {
+        services.forEach {
+            val chip = Chip(requireContext())
+            chip.id = ViewCompat.generateViewId()
+            chip.tag = "addTenantChipService-${it.id}"
+            chip.text = it.name
+
+            binding.addTenantChipGroupServices.addView(chip)
         }
     }
 
@@ -169,6 +187,10 @@ class AddTenantFragment : Fragment() {
             dashboardViewModel.rooms.value!![index] = it
 
             findNavController().navigateUp()
+        }
+
+        roomViewModel.services.observeOnce(viewLifecycleOwner) {
+            loadServiceChip(it)
         }
     }
 }

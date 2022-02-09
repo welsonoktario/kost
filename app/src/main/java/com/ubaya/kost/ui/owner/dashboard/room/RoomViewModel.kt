@@ -7,10 +7,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.Room
+import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.util.VolleyClient
 import kotlinx.coroutines.launch
@@ -27,12 +29,47 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
     private val _tenant = MutableLiveData<Tenant>()
     val tenant: LiveData<Tenant> = _tenant
 
+    private val _services = MutableLiveData<ArrayList<Service>>()
+    val services: LiveData<ArrayList<Service>> = _services
+
     fun setRoom(room: Room) {
         _room.value = room
     }
 
     fun setTenant(tenant: Tenant) {
         _tenant.value = tenant
+    }
+
+    fun loadServices() {
+        val newError = Error(false, "")
+        isLoading.value = true
+        error.value = newError
+
+        viewModelScope.launch {
+            val url = VolleyClient.BASE_URL + "/services"
+            val request = object : StringRequest(url,
+                { res ->
+                    isLoading.value = false
+                    error.value = newError
+
+                    val data = Gson().fromJson<ArrayList<Service>>(res.toString(), Service.listType)
+                    _services.value = data
+                },
+                { err ->
+                    val data = JSONObject(String(err.networkResponse.data))
+
+                    isLoading.value = false
+                    newError.isError = true
+                    newError.msg = data.getString("msg")
+
+                    error.value = newError
+                }
+            ) {
+                override fun getHeaders() = hashMapOf(
+                    "Authorization" to "Bearer ${Global.authToken}"
+                )
+            }
+        }
     }
 
     fun loadRoom(id: Int) {
