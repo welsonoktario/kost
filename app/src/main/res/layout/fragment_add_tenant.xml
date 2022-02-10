@@ -153,7 +153,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scrollbars="none"
-                app:singleSelection="false" />
+                app:singleLine="true" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/addTenantCardFoto"
@@ -207,8 +207,8 @@
                 android:layout_marginTop="16dp"
                 android:hint="Tanggal masuk"
                 app:endIconContentDescription="Tanggal masuk"
-                app:endIconMode="custom"
-                app:endIconDrawable="@drawable/ic_round_calendar_month_24">
+                app:endIconDrawable="@drawable/ic_round_calendar_month_24"
+                app:endIconMode="custom">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/addTenantInputTglMasuk"

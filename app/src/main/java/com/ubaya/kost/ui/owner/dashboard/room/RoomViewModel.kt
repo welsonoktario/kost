@@ -7,14 +7,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
-import com.ubaya.kost.data.models.Error
-import com.ubaya.kost.data.models.Room
-import com.ubaya.kost.data.models.Service
-import com.ubaya.kost.data.models.Tenant
+import com.ubaya.kost.data.models.*
 import com.ubaya.kost.util.VolleyClient
+import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.nio.charset.Charset
@@ -40,20 +37,23 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
         _tenant.value = tenant
     }
 
-    fun loadServices() {
+    fun loadServices(kost: Kost) {
         val newError = Error(false, "")
         isLoading.value = true
         error.value = newError
 
         viewModelScope.launch {
-            val url = VolleyClient.BASE_URL + "/services"
-            val request = object : StringRequest(url,
+            val url = VolleyClient.BASE_URL + "/services?kost=${kost.id}"
+            val request = object : JsonObjectRequest(url,
                 { res ->
+                    Log.d("RES", res.toString())
                     isLoading.value = false
                     error.value = newError
 
-                    val data = Gson().fromJson<ArrayList<Service>>(res.toString(), Service.listType)
-                    _services.value = data
+                    val services = Gson().fromJson<ArrayList<Service>>(
+                        res.getString("data")
+                    )
+                    _services.value = services
                 },
                 { err ->
                     val data = JSONObject(String(err.networkResponse.data))
@@ -69,6 +69,8 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
                     "Authorization" to "Bearer ${Global.authToken}"
                 )
             }
+
+            VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
         }
     }
 

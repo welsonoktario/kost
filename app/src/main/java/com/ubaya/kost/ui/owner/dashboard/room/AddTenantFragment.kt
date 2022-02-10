@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +32,7 @@ import org.json.JSONObject
 import java.io.File
 
 class AddTenantFragment : Fragment() {
-    val args: AddTenantFragmentArgs by navArgs()
+    private val args: AddTenantFragmentArgs by navArgs()
 
     private lateinit var ktpFile: File
     private lateinit var ktpUri: Uri
@@ -83,7 +84,7 @@ class AddTenantFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         if (roomViewModel.services.value == null) {
-            roomViewModel.loadServices()
+            roomViewModel.loadServices(dashboardViewModel.kost.value!!)
         }
 
         initObserver()
@@ -105,15 +106,36 @@ class AddTenantFragment : Fragment() {
                 val params = prepareParams()
                 roomViewModel.addTenant(params)
             }
+
+
+            val services: MutableList<Int> = mutableListOf()
+            var i = 0
+
+            while (i < binding.addTenantChipGroupServices.childCount) {
+                val chip = binding.addTenantChipGroupServices.getChildAt(i) as Chip
+
+                if (chip.isChecked) {
+                    services.add(chip.tag.toString().toInt())
+                }
+                i++
+            }
+
+            Log.d("PARAMS", services.toString())
         }
     }
 
     private fun loadServiceChip(services: ArrayList<Service>) {
         services.forEach {
-            val chip = Chip(requireContext())
+            val chip = Chip(
+                context,
+                null,
+                R.style.Widget_MaterialComponents_Chip_Filter
+            )
             chip.id = ViewCompat.generateViewId()
-            chip.tag = "addTenantChipService-${it.id}"
+            chip.tag = "${it.id}"
             chip.text = it.name
+            chip.isClickable = true
+            chip.isCheckable = true
 
             binding.addTenantChipGroupServices.addView(chip)
         }
