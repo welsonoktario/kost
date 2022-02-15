@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -21,13 +22,14 @@ import androidx.navigation.navGraphViewModels
 import coil.load
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
 import com.ubaya.kost.BuildConfig
 import com.ubaya.kost.R
 import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.databinding.FragmentAddTenantBinding
 import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
-import com.ubaya.kost.util.ImageUtil
 import com.ubaya.kost.util.observeOnce
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
@@ -104,23 +106,10 @@ class AddTenantFragment : Fragment() {
         binding.addTenantBtnTambah.setOnClickListener {
             if (this::ktpUri.isInitialized) {
                 val params = prepareParams()
-                roomViewModel.addTenant(params)
+//                roomViewModel.addTenant(params)
+
+                Toast.makeText(context, params.toString(), Toast.LENGTH_LONG).show()
             }
-
-
-            val services: MutableList<Int> = mutableListOf()
-            var i = 0
-
-            while (i < binding.addTenantChipGroupServices.childCount) {
-                val chip = binding.addTenantChipGroupServices.getChildAt(i) as Chip
-
-                if (chip.isChecked) {
-                    services.add(chip.tag.toString().toInt())
-                }
-                i++
-            }
-
-            Log.d("PARAMS", services.toString())
         }
     }
 
@@ -178,10 +167,23 @@ class AddTenantFragment : Fragment() {
         user.put("password", binding.addTenantInputPassUser.text.toString())
         user.put("phone", binding.addTenantInputPhoneUser.text.toString())
 
+        val services = JSONArray()
+        var i = 0
+
+        while (i < binding.addTenantChipGroupServices.childCount) {
+            val chip = binding.addTenantChipGroupServices.getChildAt(i) as Chip
+
+            if (chip.isChecked) {
+                services.put(chip.tag.toString().toInt())
+            }
+            i++
+        }
+
         val params = JSONObject()
         params.put("room", args.room)
-        params.put("ktp", ImageUtil().contentUriToBase64(activity?.contentResolver!!, ktpUri))
+        //params.put("ktp", ImageUtil().contentUriToBase64(activity?.contentResolver!!, ktpUri))
         params.put("user", user)
+        params.put("services", services)
 
         return params
     }
