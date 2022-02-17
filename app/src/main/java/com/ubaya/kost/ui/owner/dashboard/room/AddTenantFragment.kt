@@ -4,11 +4,9 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -21,8 +19,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import coil.load
 import com.google.android.material.chip.Chip
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.Gson
 import com.ubaya.kost.BuildConfig
 import com.ubaya.kost.R
 import com.ubaya.kost.data.models.Service
@@ -32,15 +30,17 @@ import com.ubaya.kost.util.observeOnce
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AddTenantFragment : Fragment() {
-    private val args: AddTenantFragmentArgs by navArgs()
-
     private lateinit var ktpFile: File
     private lateinit var ktpUri: Uri
     private var _binding: FragmentAddTenantBinding? = null
 
     private val binding get() = _binding!!
+    private val args: AddTenantFragmentArgs by navArgs()
     private val dashboardViewModel by navGraphViewModels<DashboardViewModel>(R.id.mobile_navigation)
     private val roomViewModel by navGraphViewModels<RoomViewModel>(R.id.mobile_navigation)
 
@@ -105,11 +105,14 @@ class AddTenantFragment : Fragment() {
 
         binding.addTenantBtnTambah.setOnClickListener {
             if (this::ktpUri.isInitialized) {
-                val params = prepareParams()
-//                roomViewModel.addTenant(params)
+                roomViewModel.addTenant(prepareParams())
 
-                Toast.makeText(context, params.toString(), Toast.LENGTH_LONG).show()
+//                Toast.makeText(context, params.toString(), Toast.LENGTH_LONG).show()
             }
+        }
+
+        binding.addTenantInputTglMasuk.setOnClickListener {
+            openDatePicker()
         }
     }
 
@@ -160,6 +163,25 @@ class AddTenantFragment : Fragment() {
         return FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID, ktpFile)
     }
 
+    private fun openDatePicker() {
+        val datePicker = MaterialDatePicker.Builder
+            .datePicker()
+            .setTitleText("Tanggal masuk")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        datePicker.show(childFragmentManager, "datePicker")
+
+        datePicker.addOnPositiveButtonClickListener {
+            val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jakarta"))
+            calendar.timeInMillis = it
+            val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedDate = format.format(calendar.time)
+
+            binding.addTenantInputTglMasuk.setText(formattedDate)
+        }
+    }
+
     private fun prepareParams(): JSONObject {
         val user = JSONObject()
         user.put("username", binding.addTenantInputUserUsername.text.toString())
@@ -181,7 +203,8 @@ class AddTenantFragment : Fragment() {
 
         val params = JSONObject()
         params.put("room", args.room)
-        //params.put("ktp", ImageUtil().contentUriToBase64(activity?.contentResolver!!, ktpUri))
+//        params.put("ktp", ImageUtil().contentUriToBase64(activity?.contentResolver!!, ktpUri))
+        params.put("entry_date", binding.addTenantInputTglMasuk.text.toString())
         params.put("user", user)
         params.put("services", services)
 

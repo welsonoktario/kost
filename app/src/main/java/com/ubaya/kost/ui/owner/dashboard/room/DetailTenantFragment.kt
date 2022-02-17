@@ -4,29 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import com.ubaya.kost.data.models.Tenant
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
+import com.ubaya.kost.R
 import com.ubaya.kost.databinding.FragmentDetailTenantBinding
 
-private const val ARG_TENANT = "tenant"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [DetailTenantFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class DetailTenantFragment : Fragment() {
     private var _binding: FragmentDetailTenantBinding? = null
-    private var tenant: Tenant? = null
 
     private val binding get() = _binding!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            tenant = it.getParcelable(ARG_TENANT)
-        }
-    }
+    private val args: DetailTenantFragmentArgs by navArgs()
+    private val roomViewModel: RoomViewModel by navGraphViewModels(R.id.mobile_navigation)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,20 +26,29 @@ class DetailTenantFragment : Fragment() {
         return _binding!!.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param tenant Parameter 1.
-         * @return A new instance of fragment DetailTenantFragment.
-         */
-        @JvmStatic
-        fun newInstance(tenant: Tenant) =
-            DetailTenantFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(ARG_TENANT, tenant)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        roomViewModel.loadRoom(args.room)
+        initObserver()
+    }
+
+    private fun initObserver() {
+        roomViewModel.roomType.observe(viewLifecycleOwner) {
+            binding.detailTenantTipeKamar.text = it.name
+        }
+
+        roomViewModel.tenant.observe(viewLifecycleOwner) {
+            binding.detailTenantNama.text = it.user.name
+            binding.detailTenantPhone.text = it.user.phone
+            binding.detailTenantTglMasuk.text = it.entryDate
+            binding.detailTenantDue.text = it.dueDate
+        }
+
+        roomViewModel.services.observe(viewLifecycleOwner) {
+            val names = it.map { service -> service.name }
+            binding.detailTenantListService.adapter =
+                ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, names)
+        }
     }
 }

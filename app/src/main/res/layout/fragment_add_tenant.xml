@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
     android:scrollbars="none"
     tools:context=".ui.owner.dashboard.room.AddTenantFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
 
         <ProgressBar
             android:id="@+id/pbAddTenantLoading"
@@ -76,7 +76,7 @@
                     android:id="@+id/addTenantInputNameUser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
+                    android:inputType="textPersonName"
                     android:maxLength="16" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -214,6 +214,7 @@
                     android:id="@+id/addTenantInputTglMasuk"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:focusable="false"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>

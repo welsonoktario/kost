@@ -16,7 +16,7 @@ class VolleyClient(context: Context) {
 
     fun <T> addToRequestQueue(req: Request<T>) {
         req.retryPolicy = DefaultRetryPolicy(
-            30000,
+            60000,
             DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )

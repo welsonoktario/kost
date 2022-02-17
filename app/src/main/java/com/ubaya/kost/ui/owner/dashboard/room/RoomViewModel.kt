@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.*
@@ -20,6 +21,9 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
     val isLoading = MutableLiveData<Boolean>()
     val error = MutableLiveData(Error())
 
+    private val _roomType = MutableLiveData<RoomType>()
+    val roomType: LiveData<RoomType> = _roomType
+
     private val _room = MutableLiveData<Room>()
     val room: LiveData<Room> = _room
 
@@ -28,14 +32,6 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
 
     private val _services = MutableLiveData<ArrayList<Service>>()
     val services: LiveData<ArrayList<Service>> = _services
-
-    fun setRoom(room: Room) {
-        _room.value = room
-    }
-
-    fun setTenant(tenant: Tenant) {
-        _tenant.value = tenant
-    }
 
     fun loadServices(kost: Kost) {
         val newError = Error(false, "")
@@ -83,12 +79,17 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
             val url = VolleyClient.BASE_URL + "/rooms/$id"
             val request = object : JsonObjectRequest(url,
                 { res ->
+                    Log.d("RES", res.toString())
                     isLoading.value = false
                     error.value = newError
 
                     val data = res.getJSONObject("data")
-                    _room.value = Gson().fromJson(data.getString("room"), Room::class.java)
-                    _tenant.value = _room.value!!.tenant!!
+                    val tenant = data.getJSONObject("tenant")
+
+//                    _room.value = Gson().fromJson(data.toString())
+                    _roomType.value = Gson().fromJson(data.getString("room_type"))
+                    _tenant.value = Gson().fromJson(tenant.toString())
+                    _services.value = Gson().fromJson(tenant.getString("services"))
                 },
                 { err ->
                     val data = JSONObject(String(err.networkResponse.data))
@@ -119,35 +120,26 @@ class RoomViewModel(private val app: Application) : AndroidViewModel(app) {
 
             val request = object : JsonObjectRequest(Method.POST, url, params,
                 { res ->
-                    Log.d("RES", res.toString())
+                    val data = res.getJSONObject("data")
                     isLoading.value = false
                     error.value = newError
 
                     try {
-                        val room = Gson().fromJson(res.toString(), Room::class.java)
+                        val room = Gson().fromJson(data.toString(), Room::class.java)
 
-                        setRoom(room)
+                        _room.value = room
                     } catch (e: Exception) {
-                        Log.e("ERROR", e.message.toString())
+                        Log.e("ERROR_RESPONSE", e.message.toString())
                     }
                 },
-                { err ->
-                    Log.e("ERROR", String(err.networkResponse.data, Charset.defaultCharset()))
-                    val data =
-                        JSONObject(String(err.networkResponse.data, Charset.defaultCharset()))
-
-                    isLoading.value = false
-                    newError.isError = true
-                    newError.msg = data.getString("msg")
-
-                    error.value = newError
-                }
+                null
             ) {
                 override fun getHeaders() = hashMapOf(
                     "Authorization" to "Bearer ${Global.authToken}"
                 )
             }
 
+            request.setShouldCache(false)
             VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
         }
     }

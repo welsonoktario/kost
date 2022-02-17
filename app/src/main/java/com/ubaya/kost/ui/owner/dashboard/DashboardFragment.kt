@@ -23,8 +23,6 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
     private lateinit var roomAdapter: RoomAdapter
     private lateinit var gridLayutManager: GridLayoutManager
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private val dashboardViewModel by navGraphViewModels<DashboardViewModel>(R.id.mobile_navigation)
 
@@ -91,6 +89,14 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         dashboardViewModel.selectedRoomType.observe(viewLifecycleOwner) {
             dashboardViewModel.setRooms(it)
         }
+
+        dashboardViewModel.rooms.observe(viewLifecycleOwner) {
+            Log.d("ROOMS_CHANGED", it.toString())
+            roomAdapter.notifyItemRangeRemoved(0, it.size)
+            rooms.clear()
+            rooms.addAll(it)
+            roomAdapter.notifyItemRangeInserted(0, it.size)
+        }
     }
 
     private fun initView() {
@@ -100,13 +106,6 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         binding.dashboardRoomRV.apply {
             adapter = roomAdapter
             layoutManager = gridLayutManager
-        }
-
-        dashboardViewModel.rooms.observe(viewLifecycleOwner) {
-            roomAdapter.notifyItemRangeRemoved(0, rooms.size)
-            rooms.clear()
-            rooms.addAll(it)
-            roomAdapter.notifyItemRangeInserted(0, rooms.size)
         }
     }
 
@@ -133,9 +132,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         val room = rooms[position]
         val action =
             if (room.tenant != null) {
-                DashboardFragmentDirections.actionFragmentDashboardToFragmentDetailTenant(
-                    room.id
-                )
+                DashboardFragmentDirections.actionFragmentDashboardToFragmentDetailTenant(room.id)
             } else {
                 DashboardFragmentDirections.actionFragmentDashboardToFragmentAddTenant(room.id)
             }
