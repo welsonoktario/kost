@@ -5,7 +5,6 @@ import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import com.ubaya.kost.data.Global
 
 class VolleyClient(context: Context) {
     val requestQueue: RequestQueue by lazy {
@@ -25,6 +24,7 @@ class VolleyClient(context: Context) {
     }
 
     companion object : SingletonHolder<VolleyClient, Context>(::VolleyClient) {
-        const val BASE_URL = "http://192.168.1.2/kost/public/api"
+        const val BASE_URL = "http://192.168.1.5/kost/public"
+        const val API_URL = "$BASE_URL/api"
     }
 }

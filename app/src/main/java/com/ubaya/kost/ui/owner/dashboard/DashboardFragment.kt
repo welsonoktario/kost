@@ -13,6 +13,7 @@ import com.ubaya.kost.R
 import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.data.models.RoomType
 import com.ubaya.kost.databinding.FragmentDashboardBinding
+import com.ubaya.kost.util.PrefManager
 import com.ubaya.kost.util.observeOnce
 
 class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
@@ -62,6 +63,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
             R.id.menu_catatan -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_catatan)
             R.id.menu_chats -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_chats)
             R.id.menu_notifications -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_notifications)
+            R.id.menu_logout -> logout()
         }
 
         return super.onOptionsItemSelected(item)
@@ -91,11 +93,11 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         }
 
         dashboardViewModel.rooms.observe(viewLifecycleOwner) {
-            Log.d("ROOMS_CHANGED", it.toString())
-            roomAdapter.notifyItemRangeRemoved(0, it.size)
+            dashboardViewModel.isLoading.value = true
             rooms.clear()
             rooms.addAll(it)
-            roomAdapter.notifyItemRangeInserted(0, it.size)
+            roomAdapter.notifyDataSetChanged()
+            dashboardViewModel.isLoading.value = false
         }
     }
 
@@ -138,5 +140,13 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
             }
 
         findNavController().navigate(action)
+    }
+
+    private fun logout() {
+        val prefs = PrefManager.getInstance(requireContext())
+        prefs.clear()
+
+        findNavController().popBackStack(R.id.fragment_dashboard, true)
+        findNavController().navigate(R.id.fragment_login)
     }
 }

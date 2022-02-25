@@ -1,9 +1,10 @@
-package com.ubaya.kost.ui.owner.dashboard.room
+package com.ubaya.kost.ui.owner.dashboard.tenant
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,23 +19,30 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import coil.load
+import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.material.chip.Chip
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
 import com.ubaya.kost.BuildConfig
 import com.ubaya.kost.R
+import com.ubaya.kost.data.Global
+import com.ubaya.kost.data.models.Kost
+import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.databinding.FragmentAddTenantBinding
 import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
-import com.ubaya.kost.util.observeOnce
+import com.ubaya.kost.util.ImageUtil
+import com.ubaya.kost.util.VolleyClient
+import com.ubaya.kost.util.fromJson
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AddTenantFragment : Fragment() {
+    private lateinit var services: ArrayList<Service>
     private lateinit var ktpFile: File
     private lateinit var ktpUri: Uri
     private var _binding: FragmentAddTenantBinding? = null
@@ -42,7 +50,6 @@ class AddTenantFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: AddTenantFragmentArgs by navArgs()
     private val dashboardViewModel by navGraphViewModels<DashboardViewModel>(R.id.mobile_navigation)
-    private val roomViewModel by navGraphViewModels<RoomViewModel>(R.id.mobile_navigation)
 
     private val galleryResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
@@ -84,12 +91,7 @@ class AddTenantFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        if (roomViewModel.services.value == null) {
-            roomViewModel.loadServices(dashboardViewModel.kost.value!!)
-        }
-
-        initObserver()
+        loadServices(dashboardViewModel.kost.value!!)
 
         binding.addTenantCardFoto.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
@@ -105,9 +107,7 @@ class AddTenantFragment : Fragment() {
 
         binding.addTenantBtnTambah.setOnClickListener {
             if (this::ktpUri.isInitialized) {
-                roomViewModel.addTenant(prepareParams())
-
-//                Toast.makeText(context, params.toString(), Toast.LENGTH_LONG).show()
+                addTenant(prepareParams())
             }
         }
 
@@ -121,7 +121,7 @@ class AddTenantFragment : Fragment() {
             val chip = Chip(
                 context,
                 null,
-                R.style.Widget_MaterialComponents_Chip_Filter
+                R.style.Widget_MaterialComponents_Chip_Choice
             )
             chip.id = ViewCompat.generateViewId()
             chip.tag = "${it.id}"
@@ -203,7 +203,7 @@ class AddTenantFragment : Fragment() {
 
         val params = JSONObject()
         params.put("room", args.room)
-//        params.put("ktp", ImageUtil().contentUriToBase64(activity?.contentResolver!!, ktpUri))
+        params.put("ktp", ImageUtil().contentUriToBase64(activity?.contentResolver!!, ktpUri))
         params.put("entry_date", binding.addTenantInputTglMasuk.text.toString())
         params.put("user", user)
         params.put("services", services)
@@ -211,33 +211,92 @@ class AddTenantFragment : Fragment() {
         return params
     }
 
-    private fun initObserver() {
-        roomViewModel.isLoading.observe(viewLifecycleOwner) {
-            binding.pbAddTenantLoading.visibility = if (it) View.VISIBLE else View.GONE
-        }
-
-        roomViewModel.error.observe(viewLifecycleOwner) {
-            if (it.isError) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setMessage(roomViewModel.error.value!!.msg)
-                    .setPositiveButton("Coba Lagi") { _, _ ->
-                        roomViewModel.addTenant(prepareParams())
-                    }.show()
-            }
-        }
-
-        roomViewModel.room.observeOnce(viewLifecycleOwner) {
-            val index =
-                dashboardViewModel.rooms.value!!.indexOf(
-                    dashboardViewModel.rooms.value!!.find { room -> room.id == args.room }
+    private fun loadServices(kost: Kost) {
+        binding.addTenantLoading.visibility = View.VISIBLE
+        val url = VolleyClient.API_URL + "/services?kost=${kost.id}"
+        val request = object : JsonObjectRequest(url,
+            { res ->
+                services = Gson().fromJson<ArrayList<Service>>(
+                    res.getString("data")
                 )
-            dashboardViewModel.rooms.value!![index] = it
-
-            findNavController().navigateUp()
+                loadServiceChip(services)
+                binding.addTenantLoading.visibility = View.GONE
+                binding.addTenantLayout.visibility = View.VISIBLE
+            },
+            { err ->
+                try {
+                    val data = JSONObject(String(err.networkResponse.data))
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(data.getString("msg"))
+                        .setPositiveButton("Coba Lagi") { _, _ ->
+                            loadServices(dashboardViewModel.kost.value!!)
+                        }.show()
+                } catch (e: Exception) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage("Terjadi kesalahan sistem")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+                binding.addTenantLoading.visibility = View.GONE
+            }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer ${Global.authToken}"
+            )
         }
 
-        roomViewModel.services.observeOnce(viewLifecycleOwner) {
-            loadServiceChip(it)
+        VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
+    }
+
+    private fun addTenant(params: JSONObject) {
+        binding.addTenantLoading.visibility = View.VISIBLE
+        binding.addTenantBtnTambah.isEnabled = false
+        val url = VolleyClient.API_URL + "/tenants"
+
+        val request = object : JsonObjectRequest(
+            Method.POST, url, params,
+            { res ->
+                binding.addTenantLoading.visibility = View.GONE
+                val data = res.getJSONObject("data")
+
+                try {
+                    val index =
+                        dashboardViewModel.rooms.value!!.indexOf(
+                            dashboardViewModel.rooms.value!!.find { room -> room.id == args.room }
+                        )
+                    dashboardViewModel.rooms.value!![index] =
+                        Gson().fromJson(data.toString(), Room::class.java)
+
+                    findNavController().navigateUp()
+                } catch (e: Exception) {
+                    Log.e("ERROR_RESPONSE", e.message.toString())
+                }
+            },
+            { err ->
+                try {
+                    binding.addTenantBtnTambah.isEnabled = true
+                    val data = JSONObject(String(err.networkResponse.data))
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(data.getString("msg"))
+                        .setNegativeButton("OK", null)
+                        .setPositiveButton("Coba Lagi") { _, _ ->
+                            addTenant(prepareParams())
+                        }
+                        .show()
+                } catch (e: Exception) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage("Terjadi kesalahan sistem")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+                binding.addTenantLoading.visibility = View.GONE
+            }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer ${Global.authToken}"
+            )
         }
+
+        VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
     }
 }

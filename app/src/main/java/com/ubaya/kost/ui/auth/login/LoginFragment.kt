@@ -1,6 +1,7 @@
 package com.ubaya.kost.ui.auth.login
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,7 @@ class LoginFragment : Fragment() {
             val username = binding.loginInputUsername.text
             val password = binding.loginInputPassword.text
 
-            if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
+            if (username.isNullOrEmpty() && password.isNullOrEmpty()) {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage("Lengkapi username dan password")
                     .setPositiveButton("OK", null)
@@ -54,7 +55,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun login(username: String, password: String) {
-        val url = VolleyClient.BASE_URL + "/auth/login"
+        val url = VolleyClient.API_URL + "/auth/login"
         val params: Map<String, String> = hashMapOf("username" to username, "password" to password)
 
         val request = JsonObjectRequest(Request.Method.POST, url, JSONObject(params),
@@ -76,11 +77,19 @@ class LoginFragment : Fragment() {
                 findNavController().navigate(R.id.action_fragment_login_to_owner_navigation)
             },
             { err ->
-                val data = JSONObject(String(err.networkResponse.data))
-                MaterialAlertDialogBuilder(requireContext())
-                    .setMessage(data["msg"].toString())
-                    .setPositiveButton("OK", null)
-                    .show()
+                try {
+                    val data = JSONObject(String(err.networkResponse.data))
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(data["msg"].toString())
+                        .setPositiveButton("OK", null)
+                        .show()
+                } catch (e: Exception) {
+                    Log.d("LOGIN_ERR", e.message.toString())
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage("Terjadi kesalahan pada sistem. Silahkan coba lagi")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
             }
         )
 

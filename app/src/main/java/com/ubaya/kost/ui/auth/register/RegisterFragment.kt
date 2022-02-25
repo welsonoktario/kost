@@ -140,7 +140,7 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
             "password" to binding.registerInputPasswordUser.text.toString()
         )
 
-        val url = VolleyClient.BASE_URL + "/auth/register"
+        val url = VolleyClient.API_URL + "/auth/register"
         val request = JsonObjectRequest(Request.Method.POST, url, JSONObject(params),
             { res ->
                 val data = res.getJSONObject("data")

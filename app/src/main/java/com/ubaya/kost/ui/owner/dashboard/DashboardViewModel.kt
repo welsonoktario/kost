@@ -51,7 +51,7 @@ class DashboardViewModel(private val app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             val user = Global.authUser
-            val url = VolleyClient.BASE_URL + "/kosts/" + user.username
+            val url = VolleyClient.API_URL + "/kosts/" + user.username
             val request = object : JsonObjectRequest(url,
                 { res ->
                     isLoading.value = false

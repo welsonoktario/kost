@@ -9,7 +9,7 @@ import com.ubaya.kost.R
 import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.databinding.CardDashboardRoomBinding
 
-class RoomAdapter(private val data: ArrayList<Room>, private val listener: RoomListener) :
+class RoomAdapter(private val data: ArrayList<Room>, val listener: RoomListener) :
     RecyclerView.Adapter<RoomAdapter.RoomViewHolder>() {
 
     interface RoomListener {
@@ -19,15 +19,24 @@ class RoomAdapter(private val data: ArrayList<Room>, private val listener: RoomL
     inner class RoomViewHolder(val binding: CardDashboardRoomBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
-        fun bind(room: Room) {
+        init {
             binding.cardDashboardRoomLayout.setOnClickListener(this)
-            binding.cardDashboardRoomID.text = room.id.toString()
+        }
+
+        fun bind(room: Room) {
+            binding.cardDashboardRoomID.text = (adapterPosition + 1).toString()
 
             if (room.tenant != null) {
-                binding.cardDashboardRoomLayout.setBackgroundColor(
+                binding.cardDashboardRoomLayout.setCardBackgroundColor(
                     ContextCompat.getColor(
                         binding.root.context,
-                        R.color.design_default_color_primary
+                        R.color.primary
+                    )
+                )
+                binding.cardDashboardRoomID.setTextColor(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.design_default_color_on_primary
                     )
                 )
             }
