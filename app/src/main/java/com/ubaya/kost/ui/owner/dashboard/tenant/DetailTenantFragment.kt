@@ -6,28 +6,40 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import coil.load
+import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.material.chip.Chip
+import com.google.android.material.snackbar.Snackbar
 import com.ubaya.kost.R
+import com.ubaya.kost.data.Global
+import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.databinding.DialogAddTagihanBinding
 import com.ubaya.kost.databinding.DialogFotoBinding
+import com.ubaya.kost.databinding.DialogKonfirmasiBinding
 import com.ubaya.kost.databinding.FragmentDetailTenantBinding
 import com.ubaya.kost.util.VolleyClient
 import org.json.JSONObject
 
 class DetailTenantFragment : Fragment() {
     private var _binding: FragmentDetailTenantBinding? = null
-
-    private lateinit var dialogFotoBinding: DialogFotoBinding
-    private lateinit var dialogFoto: AlertDialog
-
+    private lateinit var dialogKonfirmasiBinding: DialogKonfirmasiBinding
     private lateinit var dialogAddTagihanBinding: DialogAddTagihanBinding
+    private lateinit var dialogFotoBinding: DialogFotoBinding
+
+    private lateinit var dialogFoto: AlertDialog
+    private lateinit var dialogKonfirmasi: AlertDialog
     private lateinit var dialogAddTagihan: AlertDialog
+    private lateinit var dialogPerpanjangan: AlertDialog
+    private lateinit var dialogHapus: AlertDialog
+
+    private lateinit var tenant: Tenant
 
     private val binding get() = _binding!!
     private val args: DetailTenantFragmentArgs by navArgs()
@@ -45,17 +57,31 @@ class DetailTenantFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         tenantViewModel.loadDetailTenant(args.room)
+        tenantViewModel.msg.value = null
+
         initObserver()
         initView()
     }
 
     private fun initView() {
+        binding.btnFoto.setOnClickListener {
+            fotoIdentitas()
+        }
+
+        binding.btnKonfirm.setOnClickListener {
+            btnKonfirm()
+        }
+
         binding.btnTambah.setOnClickListener {
             btnTambah()
         }
 
-        binding.btnFoto.setOnClickListener {
-            fotoIdentitas()
+        binding.btnPerpanjang.setOnClickListener {
+            btnPerpanjang()
+        }
+
+        binding.btnHapus.setOnClickListener {
+            btnHapus()
         }
     }
 
@@ -79,9 +105,13 @@ class DetailTenantFragment : Fragment() {
             binding.detailTenantPhone.text = it.user.phone
             binding.detailTenantTglMasuk.text = it.entryDate
             binding.detailTenantDue.text = it.dueDate
+
+            tenant = it!!
+            Log.d("tenant", it.toString())
         }
 
         tenantViewModel.services.observe(viewLifecycleOwner) {
+            binding.detailTenantListService.removeAllViews()
             it.forEach { service ->
                 val chip = Chip(
                     context,
@@ -91,11 +121,24 @@ class DetailTenantFragment : Fragment() {
                 chip.id = ViewCompat.generateViewId()
                 chip.tag = "${service.id}"
                 chip.text = service.name
-                chip.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.black))
+                chip.setTextColor(
+                    ContextCompat.getColorStateList(
+                        requireContext(),
+                        R.color.onPrimary
+                    )
+                )
                 chip.chipBackgroundColor =
                     ContextCompat.getColorStateList(requireContext(), R.color.primary)
 
                 binding.detailTenantListService.addView(chip)
+            }
+        }
+
+        tenantViewModel.msg.observe(viewLifecycleOwner) {
+            if (!it.isNullOrEmpty()) {
+                Snackbar.make(binding.addTenantLayoutMain, it, Snackbar.LENGTH_SHORT)
+                    .setAction("OK") {  }
+                    .show()
             }
         }
     }
@@ -114,6 +157,68 @@ class DetailTenantFragment : Fragment() {
             dialogFotoBinding.fotoKtp.load("${VolleyClient.BASE_URL}/storage/${tenantViewModel.tenant.value!!.ktp}")
             dialogFoto.show()
         }
+    }
+
+    private fun btnKonfirm() {
+        val tenant = tenantViewModel.tenant.value!!
+        val roomType = tenantViewModel.roomType.value!!
+        val services = tenantViewModel.services.value!!
+        var total = roomType.cost!!
+
+        if (!this::dialogKonfirmasiBinding.isInitialized) {
+            dialogKonfirmasiBinding =
+                DialogKonfirmasiBinding.inflate(layoutInflater, binding.root, false)
+        }
+
+        dialogKonfirmasiBinding.dialogKonfirmasiService.removeAllViews()
+        dialogKonfirmasiBinding.dialogKonfirmasiTanggalMulai.text = tenant.entryDate
+        dialogKonfirmasiBinding.dialogKonfirmasiTanggalAkhir.text = tenant.dueDate
+        dialogKonfirmasiBinding.dialogKonfirmasiJenis.text = roomType.name
+        dialogKonfirmasiBinding.dialogKonfirmasiJenisHarga.text = "Rp ${roomType.cost}"
+
+        services.forEach {
+            val row = LinearLayout(requireContext())
+            row.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            row.orientation = LinearLayout.HORIZONTAL
+            total += it.cost!!
+
+            val name = TextView(requireContext())
+            name.text = it.name
+
+            val price = TextView(requireContext())
+            price.text = "Rp ${it.cost}"
+
+            row.addView(
+                name,
+                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+            )
+            row.addView(price)
+
+            dialogKonfirmasiBinding.dialogKonfirmasiService.addView(row)
+        }
+
+        dialogKonfirmasiBinding.dialogKonfirmasiTotal.text = "Rp $total"
+
+        if (!this::dialogKonfirmasi.isInitialized) {
+            dialogKonfirmasi = AlertDialog.Builder(requireContext())
+                .setView(dialogKonfirmasiBinding.root)
+                .setTitle("Konfirmasi Tagihan")
+                .setPositiveButton("Konfirmasi", null)
+                .setNegativeButton("Batal", null)
+                .setCancelable(false)
+                .create()
+
+            dialogKonfirmasi.setOnShowListener {
+                dialogKonfirmasi.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                    konfirmasiPembayaran()
+                }
+            }
+        }
+
+        dialogKonfirmasi.show()
     }
 
     private fun btnTambah() {
@@ -136,11 +241,65 @@ class DetailTenantFragment : Fragment() {
                     addTagihan()
                 }
             }
-
-            dialogAddTagihan.show()
-        } else {
-            dialogAddTagihan.show()
         }
+
+        dialogAddTagihan.show()
+    }
+
+    private fun btnPerpanjang() {
+        if (!this::dialogPerpanjangan.isInitialized) {
+            dialogPerpanjangan = AlertDialog.Builder(requireContext())
+                .setTitle("Perpanjang Masa Sewa")
+                .setMessage("Anda yakin ingin melakukan perpanjangan masa sewa dan masa sewa " +
+                        "penyewa akan terakumulasi sebanyak 1 bulan dari mulai dari anda " +
+                        "mengonfirmasi proses perpanjangan ini?")
+                .setPositiveButton("Perpanjang") { _, _ -> perpanjang() }
+                .setNegativeButton("Batal", null)
+                .setCancelable(false)
+                .create()
+        }
+
+        dialogPerpanjangan.show()
+    }
+
+    private fun btnHapus() {
+        if (!this::dialogHapus.isInitialized) {
+            dialogHapus = AlertDialog.Builder(requireContext())
+                .setTitle("Hapus Penyewa")
+                .setMessage("Anda yakin ingin melakukan penghapusan penyewa dan jika penghapusan " +
+                        "sudah terjadi maka tidak dapat dikembalikan. Penghapusan akan membuat " +
+                        "kamar menjadi tersedia untuk disewakan. Apakah anda tetap ingin " +
+                        "melakukan penghapusan?")
+                .setPositiveButton("Hapus") { _, _ -> hapus() }
+                .setNegativeButton("Batal", null)
+                .setCancelable(false)
+                .create()
+        }
+
+        dialogHapus.show()
+    }
+
+    private fun konfirmasiPembayaran() {
+        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/konfirmasi"
+
+        val request = object : JsonObjectRequest(url,
+            { res ->
+                dialogKonfirmasi.dismiss()
+                tenantViewModel.msg.value = res.getString("msg")
+            },
+            { err ->
+                Log.d("ERR", err.networkResponse.toString())
+                val data = JSONObject(String(err.networkResponse.data))
+                dialogKonfirmasi.dismiss()
+                tenantViewModel.msg.value = data.getString("msg")
+            }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer ${Global.authToken}"
+            )
+        }
+
+        VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
     }
 
     private fun addTagihan() {
@@ -148,11 +307,73 @@ class DetailTenantFragment : Fragment() {
         val deskripsi = dialogAddTagihanBinding.addTagihanDeskripsi.text.toString()
 
         val params = JSONObject()
-        params.put("nominal", nominal)
-        params.put("deskripsi", deskripsi)
+        params.put("cost", nominal)
+        params.put("description", deskripsi)
 
-        Log.d("ADD_TAGIHAN", params.toString())
+        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/tagihan"
 
-        dialogAddTagihan.dismiss()
+        val request = object : JsonObjectRequest(
+            Method.POST, url, params,
+            { res ->
+                dialogAddTagihan.dismiss()
+                tenantViewModel.msg.value = res.getString("msg")
+            },
+            { err ->
+                val data = JSONObject(String(err.networkResponse.data))
+                dialogAddTagihan.dismiss()
+                tenantViewModel.msg.value = data.getString("msg")
+            }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer ${Global.authToken}"
+            )
+        }
+
+        VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
+    }
+
+    private fun perpanjang() {
+        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/perpanjang"
+
+        val request = object : JsonObjectRequest(url,
+            { res ->
+                dialogPerpanjangan.dismiss()
+                tenantViewModel.msg.value = res.getString("msg")
+            },
+            { err ->
+                val data = JSONObject(String(err.networkResponse.data))
+                dialogPerpanjangan.dismiss()
+                tenantViewModel.msg.value = data.getString("msg")
+            }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer ${Global.authToken}"
+            )
+        }
+
+        VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
+    }
+
+    private fun hapus() {
+        val url = VolleyClient.API_URL + "/tenants/${tenant.id}"
+
+        val request = object : JsonObjectRequest(Method.DELETE, url, null,
+            { res ->
+                dialogHapus.dismiss()
+                tenantViewModel.msg.value = res.getString("msg")
+            },
+            { err ->
+                Log.d("ERR", err.toString())
+                val data = JSONObject(String(err.networkResponse.data))
+                dialogHapus.dismiss()
+                tenantViewModel.msg.value = data.getString("msg")
+            }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer ${Global.authToken}"
+            )
+        }
+
+        VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
     }
 }

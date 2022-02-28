@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.fragment_login -> navView.visibility = View.GONE
                 R.id.fragment_register -> navView.visibility = View.GONE

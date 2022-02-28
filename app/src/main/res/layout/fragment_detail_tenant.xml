@@ -9,6 +9,7 @@
     tools:context=".ui.owner.dashboard.tenant.DetailTenantFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/addTenantLayoutMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

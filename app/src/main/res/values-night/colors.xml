@@ -9,4 +9,5 @@
     <color name="secondary">#ffccc2dc</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="onPrimary">#FF000000</color>
 </resources>

@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -45,7 +46,9 @@ class AddTenantFragment : Fragment() {
     private lateinit var services: ArrayList<Service>
     private lateinit var ktpFile: File
     private lateinit var ktpUri: Uri
+    private lateinit var durasi: Map<Int, String>
     private var _binding: FragmentAddTenantBinding? = null
+    private var selectedDurasi = 0
 
     private val binding get() = _binding!!
     private val args: AddTenantFragmentArgs by navArgs()
@@ -113,6 +116,25 @@ class AddTenantFragment : Fragment() {
 
         binding.addTenantInputTglMasuk.setOnClickListener {
             openDatePicker()
+        }
+
+        durasi = mapOf(1 to "1 Bulan", 3 to "3 Bulan", 6 to "6 Bulan", 12 to "1 Tahun")
+
+        val durasiText = durasi.map { it.value }.toList()
+
+        binding.addTenantInputDurasi.setAdapter(
+            ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                durasiText
+            )
+        )
+
+        binding.addTenantInputDurasi.setSelection(0)
+        binding.addTenantInputDurasi.setText(durasiText[0], false)
+        binding.addTenantInputDurasi.setOnItemClickListener { parent, view, position, id ->
+            selectedDurasi = durasi.keys.toList()[position]
+            Log.d("DURASI", selectedDurasi.toString())
         }
     }
 
@@ -186,7 +208,6 @@ class AddTenantFragment : Fragment() {
         val user = JSONObject()
         user.put("username", binding.addTenantInputUserUsername.text.toString())
         user.put("name", binding.addTenantInputNameUser.text.toString())
-        user.put("password", binding.addTenantInputPassUser.text.toString())
         user.put("phone", binding.addTenantInputPhoneUser.text.toString())
 
         val services = JSONArray()
@@ -207,6 +228,7 @@ class AddTenantFragment : Fragment() {
         params.put("entry_date", binding.addTenantInputTglMasuk.text.toString())
         params.put("user", user)
         params.put("services", services)
+        params.put("durasi", selectedDurasi)
 
         return params
     }
