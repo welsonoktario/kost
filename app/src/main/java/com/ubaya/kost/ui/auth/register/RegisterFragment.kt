@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
@@ -20,6 +21,7 @@ import com.ubaya.kost.data.models.User
 import com.ubaya.kost.databinding.FragmentRegisterBinding
 import com.ubaya.kost.util.PrefManager
 import com.ubaya.kost.util.VolleyClient
+import org.json.JSONArray
 import org.json.JSONObject
 
 class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
@@ -62,14 +64,12 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
         }
 
         binding.registerBtnJenis.setOnClickListener {
-            val roomType = RoomType()
-            roomTypes.add(0, roomType)
+            roomTypes.add(0, RoomType())
             roomTypeAdapter.notifyItemInserted(0)
         }
 
         binding.registerBtnService.setOnClickListener {
-            val service = Service()
-            services.add(0, service)
+            services.add(0, Service())
             serviceAdapter.notifyItemInserted(0)
         }
 
@@ -89,7 +89,9 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
             binding.registerInputPasswordUser,
             binding.registerInputPasswordConfirmUser,
             binding.registerInputNamaKost,
-            binding.registerInputAlamatKost
+            binding.registerInputAlamatKost,
+            binding.registerInputNominal,
+            binding.registerInputInterval
         )
 
         inputs.forEach { input ->
@@ -113,6 +115,14 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
             binding.registerInputPasswordConfirmUser.error = "Password tidak cocok"
         }
 
+        if (roomTypes.isEmpty()) {
+            isValid = false
+            MaterialAlertDialogBuilder(requireContext())
+                .setMessage("Tambahkan minimal 1 jenis kamar")
+                .setPositiveButton("OK", null)
+                .show()
+        }
+
         return isValid
     }
 
@@ -127,21 +137,28 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
     private fun register() {
         val pref = PrefManager.getInstance(requireContext())
         kost = Kost(
-            0,
-            binding.registerInputNamaKost.text.toString(),
-            binding.registerInputAlamatKost.text.toString(),
-            setUser()
+            name = binding.registerInputNamaKost.text.toString(),
+            address = binding.registerInputAlamatKost.text.toString(),
+            user = setUser(),
+            nominalDenda = binding.registerInputNominal.text.toString().toInt(),
+            intervalDenda = binding.registerInputInterval.text.toString().toInt()
         )
-        val gson = GsonBuilder().disableHtmlEscaping().serializeNulls().create()
-        val params: Map<String, String> = hashMapOf(
+        val gson = GsonBuilder().disableHtmlEscaping().create()
+        /*val params: Map<String, String> = hashMapOf(
             "kost" to gson.toJson(kost),
             "types" to gson.toJson(roomTypes),
             "services" to gson.toJson(services),
             "password" to binding.registerInputPasswordUser.text.toString()
-        )
+        )*/
+
+        val params2 = JSONObject()
+        params2.put("kost", JSONObject(gson.toJson(kost)))
+        params2.put("types", JSONArray(gson.toJson(roomTypes)))
+        params2.put("services", JSONArray(gson.toJson(services)))
+        params2.put("password", binding.registerInputPasswordUser.text.toString())
 
         val url = VolleyClient.API_URL + "/auth/register"
-        val request = JsonObjectRequest(Request.Method.POST, url, JSONObject(params),
+        val request = JsonObjectRequest(Request.Method.POST, url, params2,
             { res ->
                 val data = res.getJSONObject("data")
                 val user = gson.fromJson(data.get("user").toString(), User::class.java)

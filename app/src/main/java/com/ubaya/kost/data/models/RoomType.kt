@@ -13,8 +13,4 @@ data class RoomType(
     @SerializedName("room_count") var count: Int? = 0,
     var cost: Int? = 0,
     var rooms: ArrayList<Room>? = null
-) : Parcelable {
-    companion object {
-        val listType: Type = object : TypeToken<ArrayList<RoomType>>() {}.type
-    }
-}
+) : Parcelable

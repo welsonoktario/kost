@@ -1,12 +1,25 @@
 package com.ubaya.kost.util
 
 import android.content.Context
-import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 
 class VolleyClient(context: Context) {
+    companion object {
+        @Volatile
+        private var INSTANCE: VolleyClient? = null
+        fun getInstance(context: Context) =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: VolleyClient(context).also {
+                    INSTANCE = it
+                }
+            }
+
+        const val BASE_URL = "http://192.168.1.8/kost/public"
+        const val API_URL = "$BASE_URL/api"
+    }
+
     val requestQueue: RequestQueue by lazy {
         // applicationContext is key, it keeps you from leaking the
         // Activity or BroadcastReceiver if someone passes one in.
@@ -14,17 +27,6 @@ class VolleyClient(context: Context) {
     }
 
     fun <T> addToRequestQueue(req: Request<T>) {
-        req.retryPolicy = DefaultRetryPolicy(
-            60000,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-
         requestQueue.add(req)
-    }
-
-    companion object : SingletonHolder<VolleyClient, Context>(::VolleyClient) {
-        const val BASE_URL = "http://192.168.1.5/kost/public"
-        const val API_URL = "$BASE_URL/api"
     }
 }

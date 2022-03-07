@@ -101,13 +101,16 @@ class DetailTenantFragment : Fragment() {
         }
 
         tenantViewModel.tenant.observe(viewLifecycleOwner) {
-            binding.detailTenantNama.text = it.user.name
-            binding.detailTenantPhone.text = it.user.phone
-            binding.detailTenantTglMasuk.text = it.entryDate
-            binding.detailTenantDue.text = it.dueDate
-
             tenant = it!!
-            Log.d("tenant", it.toString())
+
+            binding.detailTenantNama.text = tenant.user.name
+            binding.detailTenantPhone.text = tenant.user.phone
+            binding.detailTenantTglMasuk.text = tenant.entryDate
+            binding.detailTenantDue.text = tenant.dueDate
+
+            if (tenant.diffFromDue() > 7) {
+                binding.cardTagihan.visibility = View.GONE
+            }
         }
 
         tenantViewModel.services.observe(viewLifecycleOwner) {
@@ -137,7 +140,7 @@ class DetailTenantFragment : Fragment() {
         tenantViewModel.msg.observe(viewLifecycleOwner) {
             if (!it.isNullOrEmpty()) {
                 Snackbar.make(binding.addTenantLayoutMain, it, Snackbar.LENGTH_SHORT)
-                    .setAction("OK") {  }
+                    .setAction("OK") { }
                     .show()
             }
         }
@@ -152,11 +155,11 @@ class DetailTenantFragment : Fragment() {
             dialogFotoBinding.fotoKtp.load("${VolleyClient.BASE_URL}/storage/${tenantViewModel.tenant.value!!.ktp}")
             dialogFoto = AlertDialog.Builder(requireContext())
                 .setView(dialogFotoBinding.root)
-                .show()
-        } else {
-            dialogFotoBinding.fotoKtp.load("${VolleyClient.BASE_URL}/storage/${tenantViewModel.tenant.value!!.ktp}")
-            dialogFoto.show()
+                .create()
         }
+
+        dialogFotoBinding.fotoKtp.load("${VolleyClient.BASE_URL}/storage/${tenantViewModel.tenant.value!!.ktp}")
+        dialogFoto.show()
     }
 
     private fun btnKonfirm() {
@@ -250,9 +253,11 @@ class DetailTenantFragment : Fragment() {
         if (!this::dialogPerpanjangan.isInitialized) {
             dialogPerpanjangan = AlertDialog.Builder(requireContext())
                 .setTitle("Perpanjang Masa Sewa")
-                .setMessage("Anda yakin ingin melakukan perpanjangan masa sewa dan masa sewa " +
-                        "penyewa akan terakumulasi sebanyak 1 bulan dari mulai dari anda " +
-                        "mengonfirmasi proses perpanjangan ini?")
+                .setMessage(
+                    "Anda yakin ingin melakukan perpanjangan masa sewa dan masa sewa " +
+                            "penyewa akan terakumulasi sebanyak 1 bulan dari mulai dari anda " +
+                            "mengonfirmasi proses perpanjangan ini?"
+                )
                 .setPositiveButton("Perpanjang") { _, _ -> perpanjang() }
                 .setNegativeButton("Batal", null)
                 .setCancelable(false)
@@ -264,12 +269,17 @@ class DetailTenantFragment : Fragment() {
 
     private fun btnHapus() {
         if (!this::dialogHapus.isInitialized) {
-            dialogHapus = AlertDialog.Builder(requireContext())
+            dialogHapus = AlertDialog.Builder(
+                requireContext(),
+                R.style.ThemeOverlay_MaterialComponents_Dialog
+            )
                 .setTitle("Hapus Penyewa")
-                .setMessage("Anda yakin ingin melakukan penghapusan penyewa dan jika penghapusan " +
-                        "sudah terjadi maka tidak dapat dikembalikan. Penghapusan akan membuat " +
-                        "kamar menjadi tersedia untuk disewakan. Apakah anda tetap ingin " +
-                        "melakukan penghapusan?")
+                .setMessage(
+                    "Anda yakin ingin melakukan penghapusan penyewa dan jika penghapusan " +
+                            "sudah terjadi maka tidak dapat dikembalikan. Penghapusan akan membuat " +
+                            "kamar menjadi tersedia untuk disewakan. Apakah anda tetap ingin " +
+                            "melakukan penghapusan?"
+                )
                 .setPositiveButton("Hapus") { _, _ -> hapus() }
                 .setNegativeButton("Batal", null)
                 .setCancelable(false)

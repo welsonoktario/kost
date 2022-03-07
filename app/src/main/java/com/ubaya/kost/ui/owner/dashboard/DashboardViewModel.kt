@@ -14,6 +14,7 @@ import com.ubaya.kost.data.models.Kost
 import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.data.models.RoomType
 import com.ubaya.kost.util.VolleyClient
+import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -59,10 +60,8 @@ class DashboardViewModel(private val app: Application) : AndroidViewModel(app) {
 
                     val data = res.getJSONObject("data")
                     val kost = Gson().fromJson(data.toString(), Kost::class.java)
-                    val roomTypes = Gson().fromJson<ArrayList<RoomType>>(
-                        data.getString("room_types"),
-                        RoomType.listType
-                    )
+                    val roomTypes =
+                        Gson().fromJson<ArrayList<RoomType>>(data.getString("room_types"))
                     kost.user = user
                     setKost(kost)
                     setRoomTypes(roomTypes)
