@@ -144,12 +144,6 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
             intervalDenda = binding.registerInputInterval.text.toString().toInt()
         )
         val gson = GsonBuilder().disableHtmlEscaping().create()
-        /*val params: Map<String, String> = hashMapOf(
-            "kost" to gson.toJson(kost),
-            "types" to gson.toJson(roomTypes),
-            "services" to gson.toJson(services),
-            "password" to binding.registerInputPasswordUser.text.toString()
-        )*/
 
         val params2 = JSONObject()
         params2.put("kost", JSONObject(gson.toJson(kost)))

@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/tenant_navigation">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tenant_navigation"
+    app:startDestination="@id/fragment_tenant_home">
 
+    <fragment
+        android:id="@+id/fragment_tenant_home"
+        android:name="com.ubaya.kost.ui.tenant.home.TenantHomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_tenant_home" >
+        <action
+            android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_notification"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
+            app:destination="@id/fragment_tenant_notification" />
+        <action
+            android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_message"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
+            app:destination="@id/fragment_tenant_message" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_tenant_message"
+        android:name="com.ubaya.kost.ui.tenant.message.TenantMessageFragment"
+        android:label="Messages"
+        tools:layout="@layout/fragment_tenant_message" />
+    <fragment
+        android:id="@+id/fragment_tenant_notification"
+        android:name="com.ubaya.kost.ui.tenant.notification.TenantNotificationFragment"
+        android:label="Notifications"
+        tools:layout="@layout/fragment_tenant_notification" />
 </navigation>

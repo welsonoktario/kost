@@ -13,6 +13,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
+import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.data.models.User
 import com.ubaya.kost.databinding.FragmentLoginBinding
 import com.ubaya.kost.util.PrefManager
@@ -55,26 +56,47 @@ class LoginFragment : Fragment() {
     }
 
     private fun login(username: String, password: String) {
+        val prefs = PrefManager.getInstance(requireContext())
         val url = VolleyClient.API_URL + "/auth/login"
         val params: Map<String, String> = hashMapOf("username" to username, "password" to password)
+
+        prefs.clear()
 
         val request = JsonObjectRequest(Request.Method.POST, url, JSONObject(params),
             { res ->
                 val data = JSONObject(res["data"].toString())
-                val user = Gson().fromJson(data["user"].toString(), User::class.java)
+                val dataUser = data.getJSONObject("user")
+                val user = Gson().fromJson(dataUser.toString(), User::class.java)
+                val tenant = Gson().fromJson(dataUser["tenant"].toString(), Tenant::class.java)
                 val token = data["token"].toString()
 
-                PrefManager.getInstance(requireContext()).apply {
-                    authUser = user
-                    authToken = token
-                }
+                if (user.type == "Owner" && tenant == null) {
+                    prefs.apply {
+                        authUser = user
+                        authToken = token
+                    }
 
-                Global.apply {
-                    authUser = user
-                    authToken = token
-                }
+                    Global.apply {
+                        authUser = user
+                        authToken = token
+                    }
 
-                findNavController().navigate(R.id.action_fragment_login_to_owner_navigation)
+                    findNavController().navigate(R.id.action_fragment_login_to_owner_navigation)
+                } else {
+                    prefs.apply {
+                        authUser = user
+                        authTenant = tenant
+                        authToken = token
+                    }
+
+                    Global.apply {
+                        authUser = user
+                        authTenant = tenant
+                        authToken = token
+                    }
+
+                    findNavController().navigate(R.id.action_fragment_login_to_tenant_navigation)
+                }
             },
             { err ->
                 try {

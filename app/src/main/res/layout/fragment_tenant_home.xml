@@ -4,22 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
     android:fillViewport="true"
-    tools:context=".ui.owner.dashboard.tenant.DetailTenantFragment">
+    tools:context=".ui.tenant.home.TenantHomeFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/detail_tenant_layout_main"
+        android:id="@+id/homeTenantLayoutMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/detailTenantLayout"
+            android:id="@+id/homeTenantLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:paddingBottom="16dp"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -46,7 +45,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/detailTenantNama"
+                    android:id="@+id/homeTenantNama"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -72,10 +71,10 @@
                     android:text="No. HP"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/detailTenantNama" />
+                    app:layout_constraintTop_toBottomOf="@+id/homeTenantNama" />
 
                 <TextView
-                    android:id="@+id/detailTenantPhone"
+                    android:id="@+id/homeTenantPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -95,7 +94,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/btnFoto" />
 
                 <TextView
-                    android:id="@+id/detailTenantTglMasuk"
+                    android:id="@+id/homeTenantTglMasuk"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -113,10 +112,10 @@
                     android:text="Tipe Kamar"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/detailTenantPhone" />
+                    app:layout_constraintTop_toBottomOf="@+id/homeTenantPhone" />
 
                 <TextView
-                    android:id="@+id/detailTenantTipeKamar"
+                    android:id="@+id/homeTenantTipeKamar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -133,10 +132,10 @@
                     android:text="Tanggal Tagihan"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/detailTenantTglMasuk" />
+                    app:layout_constraintTop_toBottomOf="@+id/homeTenantTglMasuk" />
 
                 <TextView
-                    android:id="@+id/detailTenantDue"
+                    android:id="@+id/homeTenantDue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -154,10 +153,10 @@
                     android:text="Service"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/detailTenantTipeKamar" />
+                    app:layout_constraintTop_toBottomOf="@+id/homeTenantTipeKamar" />
 
                 <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/detailTenantListService"
+                    android:id="@+id/homeTenantListService"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -228,63 +227,25 @@
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginVertical="8dp"
                     android:alignmentMode="alignBounds"
-                    android:columnCount="3"
+                    android:columnCount="2"
                     android:useDefaultMargins="true">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnKonfirm"
+                        android:id="@+id/btnHomeTenantService"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_gravity="fill"
-                        android:text="Konfirmasi&#10;Pembayaran"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                        android:textSize="12dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTambah"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:text="Tambah&#10;Tagihan"
+                        android:text="Tambah Service"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPerpanjang"
+                        android:id="@+id/btnHomeTenantKomplain"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:layout_gravity="fill"
-                        android:text="Perpanjang"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                        android:textSize="13sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnHapus"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:text="Hapus&#10;Penyewa"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPesan"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:text="Kirim Pesan"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBiodata"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_gravity="fill"
-                        android:text="Ubah&#10;Biodata"
+                        android:text="Komplain"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2" />
 
                 </GridLayout>
@@ -293,9 +254,10 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/detailTenantLoading"
+            android:id="@+id/homeTenantLoading"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="gone">
 
             <ProgressBar
                 android:layout_width="wrap_content"

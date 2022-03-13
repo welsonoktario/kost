@@ -139,7 +139,7 @@ class DetailTenantFragment : Fragment() {
 
         tenantViewModel.msg.observe(viewLifecycleOwner) {
             if (!it.isNullOrEmpty()) {
-                Snackbar.make(binding.addTenantLayoutMain, it, Snackbar.LENGTH_SHORT)
+                Snackbar.make(binding.detailTenantLayoutMain, it, Snackbar.LENGTH_SHORT)
                     .setAction("OK") { }
                     .show()
             }

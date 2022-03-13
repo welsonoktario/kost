@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kost"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".TenantActivity"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}"
@@ -21,6 +25,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

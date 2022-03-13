@@ -1,7 +1,6 @@
 package com.ubaya.kost.ui.owner.dashboard
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
@@ -61,7 +60,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_catatan -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_catatan)
-            R.id.menu_chats -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_chats)
+            R.id.menu_message -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_chats)
             R.id.menu_notifications -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_notifications)
             R.id.menu_logout -> logout()
         }

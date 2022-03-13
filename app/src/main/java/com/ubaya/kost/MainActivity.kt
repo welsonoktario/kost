@@ -32,8 +32,10 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
 
         val navView: BottomNavigationView = binding.navView
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(
+            R.id.nav_host_fragment_activity_main
+        ) as NavHostFragment
+
         navController = navHostFragment.navController
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_pembukuan,
                 R.id.fragment_denda,
                 R.id.fragment_transaksi,
+                R.id.fragment_tenant_home,
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -60,6 +63,9 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_chat_room -> navView.visibility = View.GONE
                 R.id.fragment_detail_tenant -> navView.visibility = View.GONE
                 R.id.fragment_add_tenant -> navView.visibility = View.GONE
+                R.id.fragment_tenant_home -> navView.visibility = View.GONE
+                R.id.fragment_tenant_notification -> navView.visibility = View.GONE
+                R.id.fragment_tenant_message -> navView.visibility = View.GONE
                 else -> navView.visibility = View.VISIBLE
             }
         }
@@ -69,14 +75,20 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
         val pref = PrefManager.getInstance(this)
 
         if (!pref.authToken.isNullOrEmpty() && pref.authUser != null) {
-            Global.apply {
-                authUser = pref.authUser!!
-                authToken = pref.authToken!!
-            }
-
             if (pref.authUser!!.type == "Owner") {
+                Global.apply {
+                    authUser = pref.authUser!!
+                    authToken = pref.authToken!!
+                }
+
                 navController.navigate(R.id.action_fragment_login_to_owner_navigation)
             } else {
+                Global.apply {
+                    authUser = pref.authUser!!
+                    authTenant = pref.authTenant!!
+                    authToken = pref.authToken!!
+                }
+
                 navController.navigate(R.id.action_fragment_login_to_tenant_navigation)
             }
         }

@@ -8,39 +8,59 @@
     <fragment
         android:id="@+id/fragment_catatan"
         android:name="com.ubaya.kost.ui.owner.catatan.CatatanFragment"
-        tools:layout="@layout/fragment_catatan"
-        android:label="Catatan" />
+        android:label="Catatan"
+        tools:layout="@layout/fragment_catatan" />
     <fragment
         android:id="@+id/fragment_dashboard"
         android:name="com.ubaya.kost.ui.owner.dashboard.DashboardFragment"
-        tools:layout="@layout/fragment_dashboard"
-        android:label="Dashboard">
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_dashboard">
         <action
             android:id="@+id/action_fragment_dashboard_to_fragment_notifications"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
             app:destination="@id/fragment_notifications"
             app:popUpTo="@id/fragment_dashboard" />
         <action
             android:id="@+id/action_fragment_dashboard_to_fragment_chats"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
             app:destination="@id/fragment_chats"
             app:popUpTo="@id/fragment_dashboard" />
         <action
             android:id="@+id/action_fragment_dashboard_to_fragment_catatan"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
             app:destination="@id/fragment_catatan"
             app:popUpTo="@id/fragment_dashboard" />
         <action
             android:id="@+id/action_fragment_dashboard_to_fragment_add_tenant"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
             app:destination="@id/fragment_add_tenant"
             app:popUpTo="@id/fragment_dashboard" />
         <action
             android:id="@+id/action_fragment_dashboard_to_fragment_detail_tenant"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
             app:destination="@id/fragment_detail_tenant"
             app:popUpTo="@id/fragment_dashboard" />
     </fragment>
     <fragment
         android:id="@+id/fragment_add_tenant"
         android:name="com.ubaya.kost.ui.owner.dashboard.tenant.AddTenantFragment"
-        tools:layout="@layout/fragment_add_tenant"
-        android:label="Add Tenant" >
+        android:label="Add Tenant"
+        tools:layout="@layout/fragment_add_tenant">
         <argument
             android:name="room"
             app:argType="integer" />
@@ -48,28 +68,32 @@
     <fragment
         android:id="@+id/fragment_notifications"
         android:name="com.ubaya.kost.ui.owner.notifications.NotificationsFragment"
-        tools:layout="@layout/fragment_notifications"
-        android:label="Notifications" />
+        android:label="Notifications"
+        tools:layout="@layout/fragment_notifications" />
     <fragment
         android:id="@+id/fragment_chats"
         android:name="com.ubaya.kost.ui.owner.chats.ChatsFragment"
-        tools:layout="@layout/fragment_chats"
-        android:label="fragment_chats">
+        android:label="fragment_chats"
+        tools:layout="@layout/fragment_chats">
         <action
             android:id="@+id/action_fragment_chats_to_fragment_chat_room"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
             app:destination="@id/fragment_chat_room"
             app:popUpTo="@id/fragment_chats" />
     </fragment>
     <fragment
         android:id="@+id/fragment_chat_room"
         android:name="com.ubaya.kost.ui.owner.chats.ChatRoomFragment"
-        tools:layout="@layout/fragment_chat_room"
-        android:label="Chat Room" />
+        android:label="Chat Room"
+        tools:layout="@layout/fragment_chat_room" />
     <fragment
         android:id="@+id/fragment_detail_tenant"
         android:name="com.ubaya.kost.ui.owner.dashboard.tenant.DetailTenantFragment"
         android:label="Detail Tenant"
-        tools:layout="@layout/fragment_detail_tenant" >
+        tools:layout="@layout/fragment_detail_tenant">
         <argument
             android:name="room"
             app:argType="integer" />
