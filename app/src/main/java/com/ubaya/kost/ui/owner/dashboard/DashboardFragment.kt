@@ -32,9 +32,6 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         savedInstanceState: Bundle?
     ): View {
         setHasOptionsMenu(true)
-        if (dashboardViewModel.kost.value == null && dashboardViewModel.roomTypes.value == null) {
-            dashboardViewModel.loadData()
-        }
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -42,6 +39,11 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (dashboardViewModel.kost.value == null && dashboardViewModel.roomTypes.value == null) {
+
+            dashboardViewModel.loadData()
+        }
 
         initView()
         initObserver()

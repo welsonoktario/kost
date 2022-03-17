@@ -49,6 +49,7 @@
             app:exitAnim="@anim/shrink_fade_out"
             app:popEnterAnim="@anim/grow_fade_in"
             app:popExitAnim="@anim/shrink_fade_out"
+            app:popUpTo="@id/fragment_register"
             app:popUpToInclusive="true" />
     </fragment>
     <include app:graph="@navigation/owner_navigation" />

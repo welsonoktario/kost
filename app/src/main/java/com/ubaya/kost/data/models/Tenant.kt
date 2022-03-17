@@ -6,7 +6,6 @@ import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Parcelize
@@ -23,11 +22,34 @@ data class Tenant(
     val user: User
 ) : Parcelable {
     fun diffFromDue(): Int {
-        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val due = LocalDate.parse(dueDate, formatter)
-        val current = LocalDate.parse(currentDate, formatter)
+        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+        val entry = LocalDate.parse(entryDate, df)
+        val currentDate = LocalDate.parse(LocalDate.now().toString(), df)
 
-        return ChronoUnit.DAYS.between(current, due).toInt()
+        return currentDate.dayOfMonth - entry.dayOfMonth
+    }
+
+    fun nextInvoice(): String {
+        val cal = Calendar.getInstance()
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+        val entry = LocalDate.parse(entryDate, df)
+        val currentDate = LocalDate.parse(LocalDate.now().toString(), df)
+
+        if (currentDate.dayOfMonth > entry.dayOfMonth) {
+            currentDate.plusMonths(1)
+        }
+
+        cal.set(currentDate.year, currentDate.monthValue, entry.dayOfMonth)
+
+        return sdf.format(cal.time)
+    }
+
+    fun lamaMenyewa(): Int {
+        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+        val entry = LocalDate.parse(entryDate, df)
+        val due = LocalDate.parse(dueDate, df)
+
+        return due.monthValue - entry.monthValue
     }
 }

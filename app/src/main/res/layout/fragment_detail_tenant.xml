@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:paddingBottom="16dp"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -146,29 +146,26 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
                 <TextView
-                    android:id="@+id/textView13"
+                    android:id="@+id/textView4"
                     style="@style/TextAppearance.MaterialComponents.Subtitle1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Service"
+                    android:text="Lama Menyewa: "
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/detailTenantTipeKamar" />
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/detailTenantListService"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/detailTenantLama"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView13"
-                    app:singleLine="true">
-
-                </com.google.android.material.chip.ChipGroup>
-
+                    android:layout_marginStart="8dp"
+                    android:text="Due"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView4"
+                    app:layout_constraintStart_toEndOf="@+id/textView4"
+                    app:layout_constraintTop_toTopOf="@+id/textView4" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.card.MaterialCardView
@@ -194,6 +191,7 @@
                         style="@style/TextAppearance.MaterialComponents.Subtitle1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:text="Tagihan Penyewa:"
                         android:textStyle="bold" />
 
@@ -204,7 +202,6 @@
                         android:text="Rp 1.000.000"
                         android:textAlignment="center"
                         android:textStyle="bold" />
-
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
@@ -301,7 +298,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:elevation="99dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

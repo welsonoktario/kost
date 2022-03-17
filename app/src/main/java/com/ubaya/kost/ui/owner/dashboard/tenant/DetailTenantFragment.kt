@@ -106,34 +106,13 @@ class DetailTenantFragment : Fragment() {
             binding.detailTenantNama.text = tenant.user.name
             binding.detailTenantPhone.text = tenant.user.phone
             binding.detailTenantTglMasuk.text = tenant.entryDate
-            binding.detailTenantDue.text = tenant.dueDate
+            binding.detailTenantDue.text = tenant.nextInvoice()
+            binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
 
-            if (tenant.diffFromDue() > 7) {
+            if (tenant.diffFromDue() >= -7) {
+                binding.cardTagihan.visibility = View.VISIBLE
+            } else {
                 binding.cardTagihan.visibility = View.GONE
-            }
-        }
-
-        tenantViewModel.services.observe(viewLifecycleOwner) {
-            binding.detailTenantListService.removeAllViews()
-            it.forEach { service ->
-                val chip = Chip(
-                    context,
-                    null,
-                    R.style.Widget_MaterialComponents_Chip_Choice
-                )
-                chip.id = ViewCompat.generateViewId()
-                chip.tag = "${service.id}"
-                chip.text = service.name
-                chip.setTextColor(
-                    ContextCompat.getColorStateList(
-                        requireContext(),
-                        R.color.onPrimary
-                    )
-                )
-                chip.chipBackgroundColor =
-                    ContextCompat.getColorStateList(requireContext(), R.color.primary)
-
-                binding.detailTenantListService.addView(chip)
             }
         }
 
