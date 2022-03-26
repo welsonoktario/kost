@@ -21,6 +21,15 @@ data class Tenant(
     val ktp: String,
     val user: User
 ) : Parcelable {
+
+    fun lamaMenyewa(): Int {
+        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+        val entry = LocalDate.parse(entryDate, df)
+        val leave = LocalDate.parse(leaveDate, df)
+
+        return leave.monthValue - entry.monthValue
+    }
+
     fun diffFromDue(): Int {
         val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
         val entry = LocalDate.parse(entryDate, df)
@@ -45,11 +54,19 @@ data class Tenant(
         return sdf.format(cal.time)
     }
 
-    fun lamaMenyewa(): Int {
+    fun perpanjangan(durasi: Int): String {
         val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
-        val entry = LocalDate.parse(entryDate, df)
+        val leaveDate = LocalDate.parse(leaveDate, df)
+
+        leaveDate.plusMonths(durasi.toLong())
+
+        return leaveDate.format(df)
+    }
+
+    fun tanggalTagihan(): String {
+        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
         val due = LocalDate.parse(dueDate, df)
 
-        return due.monthValue - entry.monthValue
+        return due.format(DateTimeFormatter.ofPattern("MM-yyyy"))
     }
 }

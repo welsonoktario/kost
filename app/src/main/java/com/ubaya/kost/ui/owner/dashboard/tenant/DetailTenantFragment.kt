@@ -8,29 +8,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import coil.load
 import com.android.volley.toolbox.JsonObjectRequest
-import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Tenant
-import com.ubaya.kost.databinding.DialogAddTagihanBinding
-import com.ubaya.kost.databinding.DialogFotoBinding
-import com.ubaya.kost.databinding.DialogKonfirmasiBinding
-import com.ubaya.kost.databinding.FragmentDetailTenantBinding
+import com.ubaya.kost.databinding.*
+import com.ubaya.kost.util.NumberUtil
 import com.ubaya.kost.util.VolleyClient
+import com.ubaya.kost.util.fromJson
 import org.json.JSONObject
 
 class DetailTenantFragment : Fragment() {
     private var _binding: FragmentDetailTenantBinding? = null
     private lateinit var dialogKonfirmasiBinding: DialogKonfirmasiBinding
     private lateinit var dialogAddTagihanBinding: DialogAddTagihanBinding
+    private lateinit var dialogPerpanjanganBinding: DialogPerpanjanganBinding
     private lateinit var dialogFotoBinding: DialogFotoBinding
 
     private lateinit var dialogFoto: AlertDialog
@@ -108,12 +106,10 @@ class DetailTenantFragment : Fragment() {
             binding.detailTenantTglMasuk.text = tenant.entryDate
             binding.detailTenantDue.text = tenant.nextInvoice()
             binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
+        }
 
-            if (tenant.diffFromDue() >= -7) {
-                binding.cardTagihan.visibility = View.VISIBLE
-            } else {
-                binding.cardTagihan.visibility = View.GONE
-            }
+        tenantViewModel.total.observe(viewLifecycleOwner) {
+            binding.detailTenantTotal.text = NumberUtil().rupiah(it)
         }
 
         tenantViewModel.msg.observe(viewLifecycleOwner) {
@@ -144,7 +140,8 @@ class DetailTenantFragment : Fragment() {
     private fun btnKonfirm() {
         val tenant = tenantViewModel.tenant.value!!
         val roomType = tenantViewModel.roomType.value!!
-        val services = tenantViewModel.services.value!!
+        val services = tenantViewModel.services.value
+        val adds = tenantViewModel.additionals.value
         var total = roomType.cost!!
 
         if (!this::dialogKonfirmasiBinding.isInitialized) {
@@ -152,37 +149,72 @@ class DetailTenantFragment : Fragment() {
                 DialogKonfirmasiBinding.inflate(layoutInflater, binding.root, false)
         }
 
-        dialogKonfirmasiBinding.dialogKonfirmasiService.removeAllViews()
-        dialogKonfirmasiBinding.dialogKonfirmasiTanggalMulai.text = tenant.entryDate
-        dialogKonfirmasiBinding.dialogKonfirmasiTanggalAkhir.text = tenant.dueDate
+        dialogKonfirmasiBinding.dialogKonfirmasiTanggal.text = tenant.tanggalTagihan()
         dialogKonfirmasiBinding.dialogKonfirmasiJenis.text = roomType.name
-        dialogKonfirmasiBinding.dialogKonfirmasiJenisHarga.text = "Rp ${roomType.cost}"
+        dialogKonfirmasiBinding.dialogKonfirmasiJenisHarga.text =
+            NumberUtil().rupiah(roomType.cost!!)
 
-        services.forEach {
-            val row = LinearLayout(requireContext())
-            row.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            row.orientation = LinearLayout.HORIZONTAL
-            total += it.cost!!
+        if (services.isNullOrEmpty()) {
+            dialogKonfirmasiBinding.dialogKonfirmasiServiceNull.visibility = View.VISIBLE
+        } else {
+            dialogKonfirmasiBinding.dialogKonfirmasiServiceNull.visibility = View.GONE
+            dialogKonfirmasiBinding.dialogKonfirmasiService.removeAllViews()
+            services.forEach {
+                val row = LinearLayout(requireContext())
+                row.layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                row.orientation = LinearLayout.HORIZONTAL
+                total += it.cost!!
 
-            val name = TextView(requireContext())
-            name.text = it.name
+                val name = TextView(requireContext())
+                name.text = it.name
 
-            val price = TextView(requireContext())
-            price.text = "Rp ${it.cost}"
+                val price = TextView(requireContext())
+                price.text = NumberUtil().rupiah(it.cost!!)
 
-            row.addView(
-                name,
-                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
-            )
-            row.addView(price)
+                row.addView(
+                    name,
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                )
+                row.addView(price)
 
-            dialogKonfirmasiBinding.dialogKonfirmasiService.addView(row)
+                dialogKonfirmasiBinding.dialogKonfirmasiService.addView(row)
+            }
         }
 
-        dialogKonfirmasiBinding.dialogKonfirmasiTotal.text = "Rp $total"
+        if (adds.isNullOrEmpty()) {
+            dialogKonfirmasiBinding.dialogKonfirmasiAddsNull.visibility = View.VISIBLE
+        } else {
+            dialogKonfirmasiBinding.dialogKonfirmasiAddsNull.visibility = View.GONE
+            dialogKonfirmasiBinding.dialogKonfirmasiAdds.removeAllViews()
+            adds.forEach {
+                val row = LinearLayout(requireContext())
+                row.layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                row.orientation = LinearLayout.HORIZONTAL
+                total += it.cost
+
+                val name = TextView(requireContext())
+                name.text = it.description
+
+                val price = TextView(requireContext())
+                price.text = NumberUtil().rupiah(it.cost)
+
+                row.addView(
+                    name,
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                )
+                row.addView(price)
+
+                dialogKonfirmasiBinding.dialogKonfirmasiAdds.addView(row)
+            }
+        }
+
+        dialogKonfirmasiBinding.dialogKonfirmasiTotal.text = NumberUtil().rupiah(total)
 
         if (!this::dialogKonfirmasi.isInitialized) {
             dialogKonfirmasi = AlertDialog.Builder(requireContext())
@@ -213,7 +245,7 @@ class DetailTenantFragment : Fragment() {
             dialogAddTagihan = AlertDialog.Builder(requireContext())
                 .setView(dialogAddTagihanBinding.root)
                 .setTitle("Tambah Tagihan")
-                .setPositiveButton("Tambah", null)
+                .setPositiveButton("Tambah") { _, _ -> addTagihan() }
                 .setNegativeButton("Batal", null)
                 .setCancelable(false)
                 .create()
@@ -229,14 +261,15 @@ class DetailTenantFragment : Fragment() {
     }
 
     private fun btnPerpanjang() {
+        if (!this::dialogPerpanjanganBinding.isInitialized) {
+            dialogPerpanjanganBinding =
+                DialogPerpanjanganBinding.inflate(layoutInflater, binding.root, false)
+        }
+
         if (!this::dialogPerpanjangan.isInitialized) {
             dialogPerpanjangan = AlertDialog.Builder(requireContext())
+                .setView(dialogPerpanjanganBinding.root)
                 .setTitle("Perpanjang Masa Sewa")
-                .setMessage(
-                    "Anda yakin ingin melakukan perpanjangan masa sewa dan masa sewa " +
-                            "penyewa akan terakumulasi sebanyak 1 bulan dari mulai dari anda " +
-                            "mengonfirmasi proses perpanjangan ini?"
-                )
                 .setPositiveButton("Perpanjang") { _, _ -> perpanjang() }
                 .setNegativeButton("Batal", null)
                 .setCancelable(false)
@@ -269,7 +302,8 @@ class DetailTenantFragment : Fragment() {
     }
 
     private fun konfirmasiPembayaran() {
-        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/konfirmasi"
+        val total = tenantViewModel.total.value
+        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/konfirmasi?total=$total"
 
         val request = object : JsonObjectRequest(url,
             { res ->
@@ -304,6 +338,11 @@ class DetailTenantFragment : Fragment() {
         val request = object : JsonObjectRequest(
             Method.POST, url, params,
             { res ->
+                val data = res.getString("data")
+                tenantViewModel.additionals.value!!.apply {
+                    this.add(Gson().fromJson(data))
+                }
+                tenantViewModel.setTotal(tenantViewModel.additionals.value!!.sumOf { add -> add.cost })
                 dialogAddTagihan.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")
             },
@@ -322,10 +361,14 @@ class DetailTenantFragment : Fragment() {
     }
 
     private fun perpanjang() {
-        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/perpanjang"
+        val durasi = dialogPerpanjanganBinding.perpanjanganDurasi.text.toString().toInt()
+        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/perpanjang?durasi=$durasi"
 
         val request = object : JsonObjectRequest(url,
             { res ->
+                val tenant = tenantViewModel.tenant.value!!
+                tenant.leaveDate = tenant.perpanjangan(durasi)
+                tenantViewModel.setTenant(tenant)
                 dialogPerpanjangan.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")
             },
