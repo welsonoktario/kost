@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import coil.load
@@ -19,6 +20,7 @@ import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.databinding.*
+import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
 import com.ubaya.kost.util.NumberUtil
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
@@ -42,6 +44,7 @@ class DetailTenantFragment : Fragment() {
     private val binding get() = _binding!!
     private val args: DetailTenantFragmentArgs by navArgs()
     private val tenantViewModel: TenantViewModel by navGraphViewModels(R.id.mobile_navigation)
+    private val dashboardViewModel: DashboardViewModel by navGraphViewModels(R.id.mobile_navigation)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -393,12 +396,21 @@ class DetailTenantFragment : Fragment() {
             { res ->
                 dialogHapus.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")
+                dashboardViewModel.rooms.value!!.apply {
+                    val index = this.indexOfFirst { room -> room.tenant?.id == tenant.id }
+                    this[index].tenant = null
+                }
+                findNavController().navigateUp()
             },
             { err ->
                 Log.d("ERR", err.toString())
-                val data = JSONObject(String(err.networkResponse.data))
                 dialogHapus.dismiss()
-                tenantViewModel.msg.value = data.getString("msg")
+                try {
+                    val data = JSONObject(String(err.networkResponse.data))
+                    tenantViewModel.msg.value = data.getString("msg")
+                } catch (e: Exception) {
+                    tenantViewModel.msg.value = "Terjadi kesalahan server"
+                }
             }
         ) {
             override fun getHeaders() = hashMapOf(
