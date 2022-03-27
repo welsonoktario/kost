@@ -104,7 +104,7 @@ class DetailTenantFragment : Fragment() {
             binding.detailTenantNama.text = tenant.user.name
             binding.detailTenantPhone.text = tenant.user.phone
             binding.detailTenantTglMasuk.text = tenant.entryDate
-            binding.detailTenantDue.text = tenant.nextInvoice()
+            binding.detailTenantDue.text = tenant.dueDate
             binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
         }
 

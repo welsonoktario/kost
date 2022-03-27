@@ -38,22 +38,6 @@ data class Tenant(
         return currentDate.dayOfMonth - entry.dayOfMonth
     }
 
-    fun nextInvoice(): String {
-        val cal = Calendar.getInstance()
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
-        val entry = LocalDate.parse(entryDate, df)
-        val currentDate = LocalDate.parse(LocalDate.now().toString(), df)
-
-        if (currentDate.dayOfMonth > entry.dayOfMonth) {
-            currentDate.plusMonths(1)
-        }
-
-        cal.set(currentDate.year, currentDate.monthValue, entry.dayOfMonth)
-
-        return sdf.format(cal.time)
-    }
-
     fun perpanjangan(durasi: Int): String {
         val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
         val leaveDate = LocalDate.parse(leaveDate, df)
