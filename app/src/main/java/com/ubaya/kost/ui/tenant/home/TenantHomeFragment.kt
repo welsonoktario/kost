@@ -3,20 +3,19 @@ package com.ubaya.kost.ui.tenant.home
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import coil.load
-import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.databinding.DialogFotoBinding
 import com.ubaya.kost.databinding.FragmentTenantHomeBinding
+import com.ubaya.kost.util.NumberUtil
 import com.ubaya.kost.util.PrefManager
 import com.ubaya.kost.util.VolleyClient
+import com.ubaya.kost.util.observeOnce
 
 class TenantHomeFragment : Fragment() {
     private var _binding: FragmentTenantHomeBinding? = null
@@ -57,8 +56,8 @@ class TenantHomeFragment : Fragment() {
         binding.homeTenantTglMasuk.text = tenant.entryDate
         binding.homeTenantDue.text = tenant.dueDate
 
-        if (tenant.diffFromDue() > 7) {
-            binding.cardTagihan.visibility = View.GONE
+        if (tenant.diffFromDue() >= 7) {
+            binding.tenantHomeCardTagihan.visibility = View.GONE
         }
 
         binding.btnFoto.setOnClickListener {
@@ -66,7 +65,7 @@ class TenantHomeFragment : Fragment() {
         }
 
         binding.btnHomeTenantService.setOnClickListener {
-//            btnKonfirm()
+            findNavController().navigate(R.id.action_fragment_tenant_home_to_fragment_tenant_service)
         }
 
         binding.btnHomeTenantKomplain.setOnClickListener {
@@ -85,32 +84,14 @@ class TenantHomeFragment : Fragment() {
             }
         }
 
-        tenantViewModel.roomType.observe(viewLifecycleOwner) {
+        tenantViewModel.roomType.observeOnce(viewLifecycleOwner) {
             binding.homeTenantTipeKamar.text = it.name
         }
 
-        tenantViewModel.services.observe(viewLifecycleOwner) {
-            binding.homeTenantListService.removeAllViews()
-            it.forEach { service ->
-                val chip = Chip(
-                    context,
-                    null,
-                    R.style.Widget_MaterialComponents_Chip_Choice
-                )
-                chip.id = ViewCompat.generateViewId()
-                chip.tag = "${service.id}"
-                chip.text = service.name
-                chip.setTextColor(
-                    ContextCompat.getColorStateList(
-                        requireContext(),
-                        R.color.onPrimary
-                    )
-                )
-                chip.chipBackgroundColor =
-                    ContextCompat.getColorStateList(requireContext(), R.color.primary)
+        tenantViewModel.services.observe(viewLifecycleOwner) { }
 
-                binding.homeTenantListService.addView(chip)
-            }
+        tenantViewModel.total.observe(viewLifecycleOwner) {
+            binding.homeTenantTagihan.text = NumberUtil().rupiah(it)
         }
 
         tenantViewModel.msg.observe(viewLifecycleOwner) {

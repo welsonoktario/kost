@@ -169,7 +169,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardTagihan"
+                android:id="@+id/tenantHomeCardTagihan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -218,7 +218,7 @@
                 app:cardElevation="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardTagihan">
+                app:layout_constraintTop_toBottomOf="@+id/tenantHomeCardTagihan">
 
                 <GridLayout
                     android:layout_width="match_parent"

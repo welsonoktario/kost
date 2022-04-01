@@ -102,6 +102,7 @@ class DetailTenantFragment : Fragment() {
         }
 
         tenantViewModel.tenant.observe(viewLifecycleOwner) {
+            Log.d("tenant", it.toString())
             tenant = it!!
 
             binding.detailTenantNama.text = tenant.user.name

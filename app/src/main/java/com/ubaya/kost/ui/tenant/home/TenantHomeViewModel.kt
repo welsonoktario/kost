@@ -14,14 +14,13 @@ import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.data.models.RoomType
 import com.ubaya.kost.data.models.Service
-import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) {
-    val gson = GsonBuilder().create()
+    val gson: Gson = GsonBuilder().create()
     val isLoading = MutableLiveData<Boolean>()
     val error = MutableLiveData(Error())
     val msg = MutableLiveData<String>()
@@ -35,6 +34,9 @@ class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) 
     private val _services = MutableLiveData<ArrayList<Service>>()
     val services: LiveData<ArrayList<Service>> = _services
 
+    private val _total = MutableLiveData<Int>()
+    val total: LiveData<Int> = _total
+
     fun loadDetailTenant(id: Int) {
         val newError = Error(false, "")
         isLoading.value = true
@@ -44,16 +46,19 @@ class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) 
             val url = VolleyClient.API_URL + "/tenants/$id"
             val request = object : JsonObjectRequest(url,
                 { res ->
-                    Log.d("res", res.toString())
                     isLoading.value = false
                     error.value = newError
 
                     val data = res.getJSONObject("data")
-                    val room = data.getJSONObject("room")
+                    val tenant = data.getJSONObject("tenant")
+                    val room = tenant.getJSONObject("room")
 
                     _room.value = gson.fromJson(room.toString())
                     _roomType.value = gson.fromJson(room.getString("room_type"))
-                    _services.value = gson.fromJson(data.getString("services"))
+                    _services.value = gson.fromJson(tenant.getString("services"))
+                    _total.value = data.getInt("total")
+
+                    Global.authKost = gson.fromJson(room.getString("kost"))
                 },
                 { err ->
                     Log.d("err", err.toString())

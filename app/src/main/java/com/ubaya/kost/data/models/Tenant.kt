@@ -2,9 +2,9 @@ package com.ubaya.kost.data.models
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.datetime.*
+import kotlinx.datetime.TimeZone
 import kotlinx.parcelize.Parcelize
-import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -23,34 +23,33 @@ data class Tenant(
 ) : Parcelable {
 
     fun lamaMenyewa(): Int {
-        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
-        val entry = LocalDate.parse(entryDate, df)
-        val leave = LocalDate.parse(leaveDate, df)
+        val entry = LocalDate.parse(entryDate)
+        val leave = LocalDate.parse(leaveDate!!)
 
-        return leave.monthValue - entry.monthValue
+        return entry.monthsUntil(leave)
     }
 
     fun diffFromDue(): Int {
-        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
-        val entry = LocalDate.parse(entryDate, df)
-        val currentDate = LocalDate.parse(LocalDate.now().toString(), df)
+        val tz = TimeZone.currentSystemDefault()
+        val due = LocalDate.parse(dueDate!!)
+        val currentDateTime = Clock.System.now().toLocalDateTime(tz).toString().split("T")
+        val currentDate = LocalDate.parse(currentDateTime[0])
 
-        return currentDate.dayOfMonth - entry.dayOfMonth
+        return currentDate.daysUntil(due)
     }
 
     fun perpanjangan(durasi: Int): String {
-        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
-        val leaveDate = LocalDate.parse(leaveDate, df)
+        val df: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+        val ld = LocalDate.parse(leaveDate!!)
+        val newLd = ld.plus(durasi, DateTimeUnit.MONTH)
 
-        leaveDate.plusMonths(durasi.toLong())
-
-        return leaveDate.format(df)
+        return newLd.toJavaLocalDate().format(df)
     }
 
     fun tanggalTagihan(): String {
-        val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
-        val due = LocalDate.parse(dueDate, df)
+        val df = DateTimeFormatter.ofPattern("MM-yyyy", Locale.getDefault())
+        val due = LocalDate.parse(dueDate!!)
 
-        return due.format(DateTimeFormatter.ofPattern("MM-yyyy"))
+        return due.toJavaLocalDate().format(df)
     }
 }

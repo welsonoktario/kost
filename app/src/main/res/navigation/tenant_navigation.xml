@@ -9,21 +9,28 @@
         android:id="@+id/fragment_tenant_home"
         android:name="com.ubaya.kost.ui.tenant.home.TenantHomeFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_tenant_home" >
+        tools:layout="@layout/fragment_tenant_home">
         <action
             android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_notification"
+            app:destination="@id/fragment_tenant_notification"
             app:enterAnim="@anim/grow_fade_in"
             app:exitAnim="@anim/shrink_fade_out"
             app:popEnterAnim="@anim/grow_fade_in"
-            app:popExitAnim="@anim/shrink_fade_out"
-            app:destination="@id/fragment_tenant_notification" />
+            app:popExitAnim="@anim/shrink_fade_out" />
         <action
             android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_message"
+            app:destination="@id/fragment_tenant_message"
             app:enterAnim="@anim/grow_fade_in"
             app:exitAnim="@anim/shrink_fade_out"
             app:popEnterAnim="@anim/grow_fade_in"
-            app:popExitAnim="@anim/shrink_fade_out"
-            app:destination="@id/fragment_tenant_message" />
+            app:popExitAnim="@anim/shrink_fade_out" />
+        <action
+            android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_service"
+            app:destination="@id/fragment_tenant_service"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out" />
     </fragment>
     <fragment
         android:id="@+id/fragment_tenant_message"
@@ -35,4 +42,9 @@
         android:name="com.ubaya.kost.ui.tenant.notification.TenantNotificationFragment"
         android:label="Notifications"
         tools:layout="@layout/fragment_tenant_notification" />
+    <fragment
+        android:id="@+id/fragment_tenant_service"
+        android:name="com.ubaya.kost.ui.tenant.service.TenantServiceFragment"
+        android:label="Tambah Service"
+        tools:layout="@layout/fragment_tenant_service" />
 </navigation>
