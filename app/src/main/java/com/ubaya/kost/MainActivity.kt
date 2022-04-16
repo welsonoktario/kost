@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 Global.apply {
                     authUser = pref.authUser!!
                     authToken = pref.authToken!!
+                    authKost = pref.authKost!!
                 }
 
                 navController.navigate(R.id.action_fragment_login_to_owner_navigation)

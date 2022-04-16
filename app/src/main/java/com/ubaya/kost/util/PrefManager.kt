@@ -3,6 +3,7 @@ package com.ubaya.kost.util
 import android.content.Context
 import androidx.core.content.edit
 import com.google.gson.Gson
+import com.ubaya.kost.data.models.Kost
 import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.data.models.User
 
@@ -21,6 +22,10 @@ class PrefManager constructor(context: Context) {
     var authTenant: Tenant?
         get() = pref.getString("AUTH_TENANT", "")?.let { Gson().fromJson(it, Tenant::class.java) }
         set(tenant) = pref.edit { putString("AUTH_TENANT", Gson().toJson(tenant)) }
+
+    var authKost: Kost?
+        get() = pref.getString("AUTH_KOST", "")?.let { Gson().fromJson(it, Kost::class.java) }
+        set(tenant) = pref.edit { putString("AUTH_KOST", Gson().toJson(tenant)) }
 
     fun clear() = pref.edit { clear() }
 

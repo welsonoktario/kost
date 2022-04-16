@@ -13,6 +13,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
+import com.ubaya.kost.data.models.Kost
 import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.data.models.User
 import com.ubaya.kost.databinding.FragmentLoginBinding
@@ -67,6 +68,8 @@ class LoginFragment : Fragment() {
                 val data = JSONObject(res["data"].toString())
                 val dataUser = data.getJSONObject("user")
                 val user = Gson().fromJson(dataUser.toString(), User::class.java)
+                val kosts = dataUser.getJSONArray("kost")
+                val kost = Gson().fromJson(kosts[0].toString(), Kost::class.java)
                 val tenant = Gson().fromJson(dataUser["tenant"].toString(), Tenant::class.java)
                 val token = data["token"].toString()
 
@@ -74,11 +77,13 @@ class LoginFragment : Fragment() {
                     prefs.apply {
                         authUser = user
                         authToken = token
+                        authKost = kost
                     }
 
                     Global.apply {
                         authUser = user
                         authToken = token
+                        authKost = kost
                     }
 
                     findNavController().navigate(R.id.action_fragment_login_to_owner_navigation)

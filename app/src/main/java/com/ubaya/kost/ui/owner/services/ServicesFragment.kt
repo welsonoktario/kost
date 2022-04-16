@@ -1,44 +1,98 @@
 package com.ubaya.kost.ui.owner.services
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.navGraphViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ubaya.kost.R
+import com.ubaya.kost.data.models.TenantService
 import com.ubaya.kost.databinding.FragmentServicesBinding
 
-class ServicesFragment : Fragment() {
+class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
+    private lateinit var tenantServices: ArrayList<TenantService>
+    private lateinit var adapter: ServicesAdapter
 
-    private lateinit var homeViewModel: ServicesViewModel
     private var _binding: FragmentServicesBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+    private val serviceViewModel by navGraphViewModels<ServicesViewModel>(R.id.mobile_navigation)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        homeViewModel =
-            ViewModelProvider(this).get(ServicesViewModel::class.java)
+    ): View {
+        if (serviceViewModel.tenantService.value!!.isEmpty()) {
+            serviceViewModel.loadServices()
+        }
 
         _binding = FragmentServicesBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
-        return root
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initView()
+        initObserver()
+    }
+
+    private fun initView() {
+        tenantServices = arrayListOf()
+        val layoutManager = LinearLayoutManager(requireContext())
+        adapter = ServicesAdapter(tenantServices, this)
+
+        binding.serviceRV.adapter = adapter
+        binding.serviceRV.layoutManager = layoutManager
+    }
+
+    private fun initObserver() {
+        serviceViewModel.tenantService.observe(viewLifecycleOwner) {
+            tenantServices.clear()
+            tenantServices.addAll(it)
+            adapter.notifyDataSetChanged()
+        }
+
+        serviceViewModel.isLoading.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.serviceRV.visibility = View.GONE
+                binding.serviceLoading.visibility = View.VISIBLE
+            } else {
+                binding.serviceRV.visibility = View.VISIBLE
+                binding.serviceLoading.visibility = View.GONE
+            }
+        }
+
+        serviceViewModel.error.observe(viewLifecycleOwner) {
+            if (it.isError) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(serviceViewModel.error.value!!.msg)
+                    .show()
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onListClick(position: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage("Apakah anda yakin ingin menyetujui permintaan pemesanan service ini?")
+            .setPositiveButton("Ya") { _, _ ->
+                serviceViewModel.updateService(
+                    position,
+                    "diterima"
+                )
+            }
+            .setNegativeButton("Tidak", null)
+            .show()
     }
 }
