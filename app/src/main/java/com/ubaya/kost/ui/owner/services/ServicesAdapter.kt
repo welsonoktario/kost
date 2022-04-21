@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ubaya.kost.R
 import com.ubaya.kost.data.models.TenantService
 import com.ubaya.kost.databinding.ListTenantServiceBinding
 
@@ -29,10 +30,16 @@ class ServicesAdapter(
             binding.listTenantServiceService.text = tenantService.service.name
             binding.listTenantServiceNo.text = tenantService.tenant.id.toString()
 
-            if (tenantService.status == "diterima") {
-                binding.listTenantServiceStatus.visibility = View.VISIBLE
-            } else {
-                binding.listTenantServiceStatus.visibility = View.GONE
+            when(tenantService.status) {
+                "diterima" -> {
+                    binding.listTenantServiceStatus.setImageResource(R.drawable.ic_baseline_check_24)
+                    binding.listTenantServiceStatus.visibility = View.VISIBLE
+                }
+                "ditolak" -> {
+                    binding.listTenantServiceStatus.setImageResource(R.drawable.ic_baseline_close_24)
+                    binding.listTenantServiceStatus.visibility = View.VISIBLE
+                }
+                else -> binding.listTenantServiceStatus.visibility = View.INVISIBLE
             }
         }
 

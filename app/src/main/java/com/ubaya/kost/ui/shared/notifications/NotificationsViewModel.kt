@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.services
+package com.ubaya.kost.ui.shared.notifications
 
 import android.app.Application
 import android.util.Log
@@ -10,31 +10,31 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Error
-import com.ubaya.kost.data.models.TenantService
+import com.ubaya.kost.data.models.Notification
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class ServicesViewModel(private val app: Application) : AndroidViewModel(app) {
+class NotificationsViewModel(private val app: Application) : AndroidViewModel(app) {
+
     val isLoading = MutableLiveData<Boolean>()
     val error = MutableLiveData(Error())
 
-    private val _tenantServices = MutableLiveData<ArrayList<TenantService>>(arrayListOf())
-    val tenantService: LiveData<ArrayList<TenantService>> = _tenantServices
+    private val _notifications = MutableLiveData<ArrayList<Notification>>(arrayListOf())
+    val notifications: LiveData<ArrayList<Notification>> = _notifications
 
-    fun loadServices() {
+    fun loadNotifications() {
         isLoading.value = true
         error.value = Error(false, "")
-        val kost = Global.authKost
-        val url = "${VolleyClient.API_URL}/tenant-service/${kost.id}"
-
         viewModelScope.launch {
+            val url = "${VolleyClient.API_URL}/notifications?user=${Global.authUser.username}"
             val request = object : JsonObjectRequest(
                 url,
                 { res ->
                     isLoading.value = false
-                    _tenantServices.value = Gson().fromJson(res.getString("data"))
+                    error.value = Error(false, "")
+                    _notifications.value = Gson().fromJson(res.getString("data"))
                 },
                 { err ->
                     Log.d("ERR", String(err.networkResponse.data))
@@ -46,7 +46,7 @@ class ServicesViewModel(private val app: Application) : AndroidViewModel(app) {
                     } catch (e: Exception) {
                         Log.e("ERR", e.message.toString())
                     }
-                },
+                }
             ) {
                 override fun getHeaders() = hashMapOf(
                     "Authorization" to "Bearer ${Global.authToken}"
@@ -57,28 +57,24 @@ class ServicesViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun updateService(position: Int, aksi: String) {
-        isLoading.value = true
+    fun readNotification(position: Int) {
         error.value = Error(false, "")
-        val id = _tenantServices.value?.get(position)?.id
-        val url = "${VolleyClient.API_URL}/tenant-service/${id}"
-        val params = JSONObject()
-        params.put("aksi", aksi)
+        val notification = _notifications.value!![position]
 
         viewModelScope.launch {
+            val url = "${VolleyClient.API_URL}/notifications/${notification.id}"
             val request = object : JsonObjectRequest(
                 Method.PUT,
                 url,
-                params,
-                {
-                    isLoading.value = false
-                    _tenantServices.value = _tenantServices.value!!.apply {
-                        this[position].status = aksi
+                null,
+                { res ->
+                    error.value = Error(false, "")
+                    _notifications.value = _notifications.value!!.apply {
+                        this[position].isRead = true
                     }
                 },
                 { err ->
                     Log.d("ERR", String(err.networkResponse.data))
-                    isLoading.value = false
 
                     try {
                         val data = JSONObject(String(err.networkResponse.data))
@@ -86,7 +82,7 @@ class ServicesViewModel(private val app: Application) : AndroidViewModel(app) {
                     } catch (e: Exception) {
                         Log.e("ERR", e.message.toString())
                     }
-                },
+                }
             ) {
                 override fun getHeaders() = hashMapOf(
                     "Authorization" to "Bearer ${Global.authToken}"

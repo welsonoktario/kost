@@ -12,6 +12,6 @@ import com.google.gson.annotations.SerializedName
 data class Notification(
     val id: Int,
     val message: String,
-    @SerializedName("is_read") val isRead: Boolean = false,
+    @SerializedName("is_read") var isRead: Boolean = false,
     @SerializedName("created_at") val date: String
 )

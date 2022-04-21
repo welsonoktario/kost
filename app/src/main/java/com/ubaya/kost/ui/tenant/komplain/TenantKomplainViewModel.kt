@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.services
+package com.ubaya.kost.ui.tenant.komplain
 
 import android.app.Application
 import android.util.Log
@@ -9,32 +9,33 @@ import androidx.lifecycle.viewModelScope
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
+import com.ubaya.kost.data.models.Complain
 import com.ubaya.kost.data.models.Error
-import com.ubaya.kost.data.models.TenantService
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class ServicesViewModel(private val app: Application) : AndroidViewModel(app) {
+class TenantKomplainViewModel(private val app: Application) : AndroidViewModel(app) {
+
     val isLoading = MutableLiveData<Boolean>()
     val error = MutableLiveData(Error())
 
-    private val _tenantServices = MutableLiveData<ArrayList<TenantService>>(arrayListOf())
-    val tenantService: LiveData<ArrayList<TenantService>> = _tenantServices
+    private val _complains = MutableLiveData<ArrayList<Complain>>(arrayListOf())
+    val complains: LiveData<ArrayList<Complain>> = _complains
 
-    fun loadServices() {
+    fun loadComplains() {
         isLoading.value = true
         error.value = Error(false, "")
-        val kost = Global.authKost
-        val url = "${VolleyClient.API_URL}/tenant-service/${kost.id}"
+        val tenant = Global.authTenant
+        val url = "${VolleyClient.API_URL}/complains?tenant=${tenant.id}"
 
         viewModelScope.launch {
             val request = object : JsonObjectRequest(
                 url,
                 { res ->
                     isLoading.value = false
-                    _tenantServices.value = Gson().fromJson(res.getString("data"))
+                    _complains.value = Gson().fromJson(res.getString("data"))
                 },
                 { err ->
                     Log.d("ERR", String(err.networkResponse.data))
@@ -57,23 +58,24 @@ class ServicesViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun updateService(position: Int, aksi: String) {
+    fun addComplain(description: String) {
         isLoading.value = true
         error.value = Error(false, "")
-        val id = _tenantServices.value?.get(position)?.id
-        val url = "${VolleyClient.API_URL}/tenant-service/${id}"
+        val url = "${VolleyClient.API_URL}/complains"
         val params = JSONObject()
-        params.put("aksi", aksi)
+        params.put("tenant", Global.authTenant.id)
+        params.put("description", description)
 
         viewModelScope.launch {
             val request = object : JsonObjectRequest(
-                Method.PUT,
+                Method.POST,
                 url,
                 params,
-                {
+                { res ->
                     isLoading.value = false
-                    _tenantServices.value = _tenantServices.value!!.apply {
-                        this[position].status = aksi
+                    val complain = Gson().fromJson(res.getString("data"), Complain::class.java)
+                    _complains.value = _complains.value!!.apply {
+                        this.add(0, complain)
                     }
                 },
                 { err ->

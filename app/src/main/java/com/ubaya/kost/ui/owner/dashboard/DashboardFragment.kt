@@ -1,17 +1,23 @@
 package com.ubaya.kost.ui.owner.dashboard
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ubaya.kost.MainActivity
 import com.ubaya.kost.R
 import com.ubaya.kost.data.models.Room
 import com.ubaya.kost.data.models.RoomType
 import com.ubaya.kost.databinding.FragmentDashboardBinding
+import com.ubaya.kost.ui.shared.notifications.NotificationsViewModel
 import com.ubaya.kost.util.PrefManager
 import com.ubaya.kost.util.observeOnce
 
@@ -22,9 +28,11 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
     private lateinit var rooms: ArrayList<Room>
     private lateinit var roomAdapter: RoomAdapter
     private lateinit var gridLayutManager: GridLayoutManager
+    private lateinit var notifCountBadge: BadgeDrawable
 
     private val binding get() = _binding!!
     private val dashboardViewModel by navGraphViewModels<DashboardViewModel>(R.id.mobile_navigation)
+    private val notificationsViewModel by navGraphViewModels<NotificationsViewModel>(R.id.mobile_navigation)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,8 +49,11 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         super.onViewCreated(view, savedInstanceState)
 
         if (dashboardViewModel.kost.value == null && dashboardViewModel.roomTypes.value == null) {
-
             dashboardViewModel.loadData()
+        }
+
+        if (notificationsViewModel.notifications.value!!.isEmpty()) {
+            notificationsViewModel.loadNotifications()
         }
 
         initView()
@@ -62,6 +73,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_catatan -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_catatan)
+            R.id.menu_komplain -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_komplain)
             R.id.menu_message -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_chats)
             R.id.menu_notifications -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_notifications)
             R.id.menu_logout -> logout()
@@ -70,6 +82,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         return super.onOptionsItemSelected(item)
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     private fun initObserver() {
         dashboardViewModel.isLoading.observe(viewLifecycleOwner) {
             binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
@@ -100,8 +113,21 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
             roomAdapter.notifyDataSetChanged()
             dashboardViewModel.isLoading.value = false
         }
+
+        notificationsViewModel.notifications.observe(viewLifecycleOwner) {
+            val toolbar = (requireActivity() as MainActivity).findViewById<Toolbar>(R.id.toolbar)
+            val count = it.filter { notif -> !notif.isRead }.size
+
+            if (count > 0) {
+                notifCountBadge.number = count
+                BadgeUtils.attachBadgeDrawable(notifCountBadge, toolbar, R.id.menu_notifications)
+            } else {
+                BadgeUtils.detachBadgeDrawable(notifCountBadge, toolbar, R.id.menu_notifications)
+            }
+        }
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     private fun initView() {
         rooms = arrayListOf()
         roomAdapter = RoomAdapter(rooms, this)
@@ -110,6 +136,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
             adapter = roomAdapter
             layoutManager = gridLayutManager
         }
+        notifCountBadge = BadgeDrawable.create(requireContext())
     }
 
     private fun initDropdown(types: ArrayList<RoomType>) {

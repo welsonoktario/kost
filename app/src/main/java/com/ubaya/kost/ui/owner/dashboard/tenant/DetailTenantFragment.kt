@@ -311,6 +311,7 @@ class DetailTenantFragment : Fragment() {
 
         val request = object : JsonObjectRequest(url,
             { res ->
+                tenantViewModel.services.value!!.clear()
                 dialogKonfirmasi.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")
             },

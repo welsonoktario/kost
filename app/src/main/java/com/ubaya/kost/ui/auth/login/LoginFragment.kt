@@ -68,12 +68,13 @@ class LoginFragment : Fragment() {
                 val data = JSONObject(res["data"].toString())
                 val dataUser = data.getJSONObject("user")
                 val user = Gson().fromJson(dataUser.toString(), User::class.java)
-                val kosts = dataUser.getJSONArray("kost")
-                val kost = Gson().fromJson(kosts[0].toString(), Kost::class.java)
                 val tenant = Gson().fromJson(dataUser["tenant"].toString(), Tenant::class.java)
                 val token = data["token"].toString()
 
                 if (user.type == "Owner" && tenant == null) {
+                    val kosts = dataUser.getJSONArray("kost")
+                    val kost = Gson().fromJson(kosts[0].toString(), Kost::class.java)
+
                     prefs.apply {
                         authUser = user
                         authToken = token

@@ -1,7 +1,6 @@
 package com.ubaya.kost.ui.owner.services
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +9,12 @@ import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ubaya.kost.R
+import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.TenantService
 import com.ubaya.kost.databinding.FragmentServicesBinding
 
 class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
+
     private lateinit var tenantServices: ArrayList<TenantService>
     private lateinit var adapter: ServicesAdapter
 
@@ -74,6 +75,7 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(serviceViewModel.error.value!!.msg)
                     .show()
+                serviceViewModel.error.value = Error()
             }
         }
     }
@@ -84,15 +86,23 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
     }
 
     override fun onListClick(position: Int) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setMessage("Apakah anda yakin ingin menyetujui permintaan pemesanan service ini?")
-            .setPositiveButton("Ya") { _, _ ->
-                serviceViewModel.updateService(
-                    position,
-                    "diterima"
-                )
-            }
-            .setNegativeButton("Tidak", null)
-            .show()
+        if (tenantServices[position].status == "pending") {
+            MaterialAlertDialogBuilder(requireContext())
+                .setMessage("Apakah anda yakin ingin menyetujui permintaan pemesanan service ini?")
+                .setPositiveButton("Terima") { _, _ ->
+                    serviceViewModel.updateService(
+                        position,
+                        "diterima"
+                    )
+                }
+                .setNegativeButton("Tolak") { _, _ ->
+                    serviceViewModel.updateService(
+                        position,
+                        "ditolak"
+                    )
+                }
+                .setNeutralButton("Batal", null)
+                .show()
+        }
     }
 }

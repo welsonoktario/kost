@@ -31,6 +31,9 @@
             app:exitAnim="@anim/shrink_fade_out"
             app:popEnterAnim="@anim/grow_fade_in"
             app:popExitAnim="@anim/shrink_fade_out" />
+        <action
+            android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_komplain"
+            app:destination="@id/fragment_tenant_komplain" />
     </fragment>
     <fragment
         android:id="@+id/fragment_tenant_message"
@@ -39,12 +42,17 @@
         tools:layout="@layout/fragment_tenant_message" />
     <fragment
         android:id="@+id/fragment_tenant_notification"
-        android:name="com.ubaya.kost.ui.tenant.notification.TenantNotificationFragment"
+        android:name="com.ubaya.kost.ui.shared.notifications.NotificationsFragment"
         android:label="Notifications"
-        tools:layout="@layout/fragment_tenant_notification" />
+        tools:layout="@layout/fragment_notifications" />
     <fragment
         android:id="@+id/fragment_tenant_service"
         android:name="com.ubaya.kost.ui.tenant.service.TenantServiceFragment"
         android:label="Tambah Service"
         tools:layout="@layout/fragment_tenant_service" />
+    <fragment
+        android:id="@+id/fragment_tenant_komplain"
+        android:name="com.ubaya.kost.ui.tenant.komplain.TenantKomplainFragment"
+        android:label="Komplain"
+        tools:layout="@layout/fragment_tenant_komplain" />
 </navigation>

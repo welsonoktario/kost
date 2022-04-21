@@ -15,6 +15,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/menu_komplain"
+        android:icon="@drawable/ic_round_receipt_24"
+        android:title="Komplain"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menu_catatan"
         android:icon="@drawable/ic_round_receipt_24"
         android:title="Catatan"

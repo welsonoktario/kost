@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.toolbar)
         val navView: BottomNavigationView = binding.navView
 
         val navHostFragment = supportFragmentManager.findFragmentById(

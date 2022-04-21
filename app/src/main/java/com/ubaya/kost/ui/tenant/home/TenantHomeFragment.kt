@@ -1,17 +1,23 @@
 package com.ubaya.kost.ui.tenant.home
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import coil.load
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.snackbar.Snackbar
+import com.ubaya.kost.MainActivity
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.databinding.DialogFotoBinding
 import com.ubaya.kost.databinding.FragmentTenantHomeBinding
+import com.ubaya.kost.ui.shared.notifications.NotificationsViewModel
 import com.ubaya.kost.util.NumberUtil
 import com.ubaya.kost.util.PrefManager
 import com.ubaya.kost.util.VolleyClient
@@ -23,8 +29,10 @@ class TenantHomeFragment : Fragment() {
 
     private lateinit var dialogFotoBinding: DialogFotoBinding
     private lateinit var dialogFoto: AlertDialog
+    private lateinit var notifCountBadge: BadgeDrawable
 
     private val tenantViewModel: TenantHomeViewModel by navGraphViewModels(R.id.mobile_navigation)
+    private val notificationsViewModel by navGraphViewModels<NotificationsViewModel>(R.id.mobile_navigation)
 
     private val user = Global.authUser
     private val tenant = Global.authTenant
@@ -44,13 +52,19 @@ class TenantHomeFragment : Fragment() {
         if (tenantViewModel.roomType.value == null) {
             tenantViewModel.loadDetailTenant(tenant.id)
         }
+
+        if (notificationsViewModel.notifications.value!!.isEmpty()) {
+            notificationsViewModel.loadNotifications()
+        }
         tenantViewModel.msg.value = null
 
         initObserver()
         initView()
     }
 
+    @SuppressLint("UnsafeOptInUsageError")
     private fun initView() {
+        notifCountBadge = BadgeDrawable.create(requireContext())
         binding.homeTenantNama.text = user.name
         binding.homeTenantPhone.text = user.phone
         binding.homeTenantTglMasuk.text = tenant.entryDate
@@ -69,7 +83,19 @@ class TenantHomeFragment : Fragment() {
         }
 
         binding.btnHomeTenantKomplain.setOnClickListener {
-//            btnTambah()
+            findNavController().navigate(R.id.action_fragment_tenant_home_to_fragment_tenant_komplain)
+        }
+
+        notificationsViewModel.notifications.observe(viewLifecycleOwner) {
+            val toolbar = (requireActivity() as MainActivity).findViewById<Toolbar>(R.id.toolbar)
+            val count = it.filter { notif -> !notif.isRead }.size
+
+            if (count > 0) {
+                notifCountBadge.number = count
+                BadgeUtils.attachBadgeDrawable(notifCountBadge, toolbar, R.id.menu_tenant_notifications)
+            } else {
+                BadgeUtils.detachBadgeDrawable(notifCountBadge, toolbar, R.id.menu_tenant_notifications)
+            }
         }
     }
 
