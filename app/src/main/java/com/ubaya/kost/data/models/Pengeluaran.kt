@@ -1,4 +1,8 @@
 package com.ubaya.kost.data.models
 
-class Pengeluaran {
-}
+data class Pengeluaran(
+    val id: Int,
+    val description: String,
+    val date: String,
+    val nominal: Int
+)
