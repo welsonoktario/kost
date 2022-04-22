@@ -155,7 +155,7 @@ class TenantServiceFragment : Fragment() {
         params.put("tenant", Global.authTenant.id)
         params.put("tanggal", binding.tenantServiceBtnTanggal.text.toString())
 
-        val url = "${API_URL}/tenant-services"
+        val url = "${API_URL}/tenant-service"
         val request = object : JsonObjectRequest(POST, url, params,
             { res ->
                 findNavController().navigateUp()
