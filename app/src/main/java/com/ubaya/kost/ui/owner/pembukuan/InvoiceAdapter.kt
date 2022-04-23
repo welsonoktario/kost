@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ubaya.kost.data.models.Invoice
 import com.ubaya.kost.databinding.CardInvoiceBinding
+import com.ubaya.kost.util.NumberUtil
 
 class InvoiceAdapter(private val data: ArrayList<Invoice>, private val listener: InvoiceListener) :
     RecyclerView.Adapter<InvoiceAdapter.InvoiceViewHolder>() {
@@ -25,7 +26,7 @@ class InvoiceAdapter(private val data: ArrayList<Invoice>, private val listener:
             binding.cardInvoiceTenant.text = invoice.tenant.user.name
             binding.cardInvoiceDate.text = invoice.date
             binding.cardInvoiceNo.text = invoice.tenant.id.toString()
-            binding.cardInvoiceTotal.text = invoice.total.toString()
+            binding.cardInvoiceTotal.text = NumberUtil().rupiah(invoice.total)
         }
 
         override fun onClick(v: View?) {

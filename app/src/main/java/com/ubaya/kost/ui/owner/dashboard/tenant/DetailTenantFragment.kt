@@ -14,10 +14,12 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import coil.load
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
+import com.ubaya.kost.data.models.Additional
 import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.databinding.*
 import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
@@ -25,6 +27,8 @@ import com.ubaya.kost.util.NumberUtil
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DetailTenantFragment : Fragment() {
     private var _binding: FragmentDetailTenantBinding? = null
@@ -102,7 +106,6 @@ class DetailTenantFragment : Fragment() {
         }
 
         tenantViewModel.tenant.observe(viewLifecycleOwner) {
-            Log.d("tenant", it.toString())
             tenant = it!!
 
             binding.detailTenantNama.text = tenant.user.name
@@ -121,6 +124,74 @@ class DetailTenantFragment : Fragment() {
                 Snackbar.make(binding.detailTenantLayoutMain, it, Snackbar.LENGTH_SHORT)
                     .setAction("OK") { }
                     .show()
+            }
+        }
+
+        tenantViewModel.additionals.observe(viewLifecycleOwner) {
+            Log.d("adds", it.toString())
+            if (it.isEmpty()) {
+                binding.detailTenantAddsNull.visibility = View.VISIBLE
+                binding.detailTenantAdds.removeAllViews()
+            } else {
+                binding.detailTenantAddsNull.visibility = View.GONE
+                binding.detailTenantAdds.removeAllViews()
+
+                it.forEach { add ->
+                    val row = LinearLayout(requireContext())
+                    row.layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    row.orientation = LinearLayout.HORIZONTAL
+
+                    val name = TextView(requireContext())
+                    name.text = add.description
+
+                    val price = TextView(requireContext())
+                    price.text = NumberUtil().rupiah(add.cost)
+
+                    row.addView(
+                        name,
+                        LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                    )
+                    row.addView(price)
+
+                    binding.detailTenantAdds.addView(row)
+                }
+            }
+        }
+
+        tenantViewModel.services.observe(viewLifecycleOwner) {
+            Log.d("services", it.toString())
+            if (it.isEmpty()) {
+                binding.detailTenantServiceNull.visibility = View.VISIBLE
+                binding.detailTenantService.removeAllViews()
+            } else {
+                binding.detailTenantServiceNull.visibility = View.GONE
+                binding.detailTenantService.removeAllViews()
+
+                it.forEach { service ->
+                    val row = LinearLayout(requireContext())
+                    row.layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    row.orientation = LinearLayout.HORIZONTAL
+
+                    val name = TextView(requireContext())
+                    name.text = service.name
+
+                    val price = TextView(requireContext())
+                    price.text = NumberUtil().rupiah(service.cost!!)
+
+                    row.addView(
+                        name,
+                        LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                    )
+                    row.addView(price)
+
+                    binding.detailTenantService.addView(row)
+                }
             }
         }
     }
@@ -160,9 +231,11 @@ class DetailTenantFragment : Fragment() {
 
         if (services.isNullOrEmpty()) {
             dialogKonfirmasiBinding.dialogKonfirmasiServiceNull.visibility = View.VISIBLE
+            dialogKonfirmasiBinding.dialogKonfirmasiService.removeAllViews()
         } else {
             dialogKonfirmasiBinding.dialogKonfirmasiServiceNull.visibility = View.GONE
             dialogKonfirmasiBinding.dialogKonfirmasiService.removeAllViews()
+
             services.forEach {
                 val row = LinearLayout(requireContext())
                 row.layoutParams = LinearLayout.LayoutParams(
@@ -190,6 +263,7 @@ class DetailTenantFragment : Fragment() {
 
         if (adds.isNullOrEmpty()) {
             dialogKonfirmasiBinding.dialogKonfirmasiAddsNull.visibility = View.VISIBLE
+            dialogKonfirmasiBinding.dialogKonfirmasiAdds.removeAllViews()
         } else {
             dialogKonfirmasiBinding.dialogKonfirmasiAddsNull.visibility = View.GONE
             dialogKonfirmasiBinding.dialogKonfirmasiAdds.removeAllViews()
@@ -231,12 +305,31 @@ class DetailTenantFragment : Fragment() {
 
             dialogKonfirmasi.setOnShowListener {
                 dialogKonfirmasi.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                    konfirmasiPembayaran()
+                    openDatePicker()
                 }
             }
         }
 
         dialogKonfirmasi.show()
+    }
+
+    private fun openDatePicker() {
+        val datePicker = MaterialDatePicker.Builder
+            .datePicker()
+            .setTitleText("Tanggal Konfirmasi")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        datePicker.show(childFragmentManager, "datePicker")
+
+        datePicker.addOnPositiveButtonClickListener {
+            val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jakarta"))
+            calendar.timeInMillis = it
+            val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val formattedDate = format.format(calendar.time)
+
+            konfirmasiPembayaran(formattedDate)
+        }
     }
 
     private fun btnTambah() {
@@ -305,21 +398,30 @@ class DetailTenantFragment : Fragment() {
         dialogHapus.show()
     }
 
-    private fun konfirmasiPembayaran() {
+    private fun konfirmasiPembayaran(date: String) {
         val total = tenantViewModel.total.value
-        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/konfirmasi?total=$total"
+        val url = VolleyClient.API_URL + "/tenants/${tenant.id}/konfirmasi?total=$total&date=$date"
 
         val request = object : JsonObjectRequest(url,
             { res ->
-                tenantViewModel.services.value!!.clear()
+                val tenant = tenantViewModel.tenant.value!!
+                tenant.dueDate = tenant.konfirmasi()
+                tenantViewModel.setTenant(tenant)
+                tenantViewModel.setServices(arrayListOf())
+                tenantViewModel.setAdditionals(arrayListOf())
                 dialogKonfirmasi.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")
             },
             { err ->
                 Log.d("ERR", err.networkResponse.toString())
-                val data = JSONObject(String(err.networkResponse.data))
                 dialogKonfirmasi.dismiss()
-                tenantViewModel.msg.value = data.getString("msg")
+
+                try {
+                    val data = JSONObject(String(err.networkResponse.data))
+                    tenantViewModel.msg.value = data.getString("msg")
+                } catch (e: Exception) {
+                    Log.e("ERRR", e.message.toString())
+                }
             }
         ) {
             override fun getHeaders() = hashMapOf(
@@ -344,9 +446,7 @@ class DetailTenantFragment : Fragment() {
             Method.POST, url, params,
             { res ->
                 val data = res.getString("data")
-                tenantViewModel.additionals.value!!.apply {
-                    this.add(Gson().fromJson(data))
-                }
+                tenantViewModel.addAdditional(Gson().fromJson(data, Additional::class.java))
                 tenantViewModel.setTotal(tenantViewModel.additionals.value!!.sumOf { add -> add.cost })
                 dialogAddTagihan.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")

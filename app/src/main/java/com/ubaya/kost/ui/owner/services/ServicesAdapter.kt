@@ -29,6 +29,7 @@ class ServicesAdapter(
             binding.listTenantServiceNama.text = tenantService.tenant.user.name
             binding.listTenantServiceService.text = tenantService.service.name
             binding.listTenantServiceNo.text = tenantService.tenant.id.toString()
+            binding.listTenantServiceDate.text = tenantService.date
 
             when(tenantService.status) {
                 "diterima" -> {

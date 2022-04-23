@@ -14,6 +14,7 @@ import com.ubaya.kost.data.models.Invoice
 import com.ubaya.kost.data.models.Pengeluaran
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -40,7 +41,8 @@ class PembukuanViewModel(private val app: Application) : AndroidViewModel(app) {
                 { res ->
                     isLoading.value = false
                     val data = res.getJSONObject("data")
-                    _invoices.value = Gson().fromJson(data.getString("invocies"))
+                    Log.d("data", data.toString())
+                    _invoices.value = Gson().fromJson(data.getString("invoices"))
                     _pengeluarans.value = Gson().fromJson(data.getString("pengeluarans"))
                 },
                 { err ->

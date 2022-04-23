@@ -28,9 +28,7 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (serviceViewModel.tenantService.value!!.isEmpty()) {
-            serviceViewModel.loadServices()
-        }
+        serviceViewModel.loadServices()
 
         _binding = FragmentServicesBinding.inflate(inflater, container, false)
 

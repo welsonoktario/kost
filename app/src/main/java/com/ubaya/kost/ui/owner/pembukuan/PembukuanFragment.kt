@@ -3,6 +3,7 @@ package com.ubaya.kost.ui.owner.pembukuan
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.navGraphViewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import com.ubaya.kost.R
@@ -14,15 +15,13 @@ class PembukuanFragment : Fragment() {
     private var _binding: FragmentPembukuanBinding? = null
 
     private val binding get() = _binding!!
-    private val pembukuanViewModel by navGraphViewModels<PembukuanViewModel>(R.id.mobile_navigation)
+    private val pembukuanViewModel by viewModels<PembukuanViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setHasOptionsMenu(true)
-
         pembukuanViewModel.loadPembukuan()
         _binding = FragmentPembukuanBinding.inflate(inflater, container, false)
         return _binding!!.root

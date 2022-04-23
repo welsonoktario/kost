@@ -29,7 +29,7 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
     private val _tenant = MutableLiveData<Tenant>()
     val tenant: LiveData<Tenant> = _tenant
 
-    private val _services = MutableLiveData<ArrayList<Service>>()
+    private val _services = MutableLiveData<ArrayList<Service>>(arrayListOf())
     val services: LiveData<ArrayList<Service>> = _services
 
     private val _additionals = MutableLiveData<ArrayList<Additional>>(arrayListOf())
@@ -44,6 +44,28 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun setTotal(total: Int) {
         _total.value = _roomType.value!!.cost?.plus(total)
+    }
+
+    fun setServices(services: ArrayList<Service>) {
+        _services.value!!.clear()
+        _services.value!!.addAll(services)
+    }
+
+    fun addService(service: Service) {
+        _services.value = _services.value!!.apply {
+            this.add(service)
+        }
+    }
+
+    fun setAdditionals(additionals: ArrayList<Additional>) {
+        _additionals.value!!.clear()
+        _additionals.value!!.addAll(additionals)
+    }
+
+    fun addAdditional(additional: Additional) {
+        _additionals.value = _additionals.value!!.apply {
+            this.add(additional)
+        }
     }
 
     fun loadDetailTenant(id: Int) {
@@ -94,36 +116,8 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun konfirmasiPembayaran() {
-        val newError = Error(false, "")
-        isLoading.value = true
-        error.value = newError
-
-        viewModelScope.launch {
-            val url = VolleyClient.API_URL + "/tenants/${_tenant.value!!.id}/konfirmasi"
-
-            val request = object : JsonObjectRequest(url,
-                { res ->
-                    isLoading.value = false
-                    error.value = newError
-
-                    msg.value = res.getString("msg")
-                },
-                { err ->
-                    val data = JSONObject(String(err.networkResponse.data))
-
-                    isLoading.value = false
-                    newError.isError = true
-                    newError.msg = data.getString("msg")
-
-                    error.value = newError
-                }
-            ) {
-                override fun getHeaders() = hashMapOf(
-                    "Authorization" to "Bearer ${Global.authToken}"
-                )
-            }
-
-            VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
+        _tenant.value = _tenant.value!!.apply {
+            this.perpanjangan(1)
         }
     }
 }

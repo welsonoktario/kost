@@ -46,6 +46,23 @@ data class Tenant(
         return newLd.toJavaLocalDate().format(df)
     }
 
+    fun konfirmasi(): String {
+        val df: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+        val dd = LocalDate.parse(dueDate!!)
+        val newDd = dd.plus(1, DateTimeUnit.MONTH)
+
+        return newDd.toJavaLocalDate().format(df)
+    }
+
+    fun canConfirm(): Boolean {
+        val tz = TimeZone.currentSystemDefault()
+        val today = Clock.System.todayAt(tz)
+        val currentDate = LocalDate(today.year, today.monthNumber, today.dayOfMonth)
+        val dd = LocalDate.parse(dueDate!!)
+
+        return true
+    }
+
     fun tanggalTagihan(): String {
         val df = DateTimeFormatter.ofPattern("MM-yyyy", Locale.getDefault())
         val due = LocalDate.parse(dueDate!!)
