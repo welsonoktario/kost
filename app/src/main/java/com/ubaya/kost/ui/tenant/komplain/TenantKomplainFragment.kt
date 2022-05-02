@@ -1,8 +1,9 @@
 package com.ubaya.kost.ui.tenant.komplain
 
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,7 +30,6 @@ class TenantKomplainFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setHasOptionsMenu(true)
         tenantKomplainViewModel.loadComplains()
         _binding = FragmentTenantKomplainBinding.inflate(inflater, container, false)
         dialogTenantAddKomplainBinding =
@@ -45,34 +45,6 @@ class TenantKomplainFragment : Fragment() {
         initObserver()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.tenant_komplain_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_tenant_add_komplain -> {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setView(dialogTenantAddKomplainBinding.root)
-                    .setTitle("Tambah Komplain")
-                    .setPositiveButton("Tambah") { _, _ ->
-                        tenantKomplainViewModel.addComplain(
-                            dialogTenantAddKomplainBinding
-                                .dialogTenantAddKomplainKomplain
-                                .text
-                                .toString()
-                        )
-                    }
-                    .setNegativeButton("Batal", null)
-                    .setCancelable(false)
-                    .show()
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -85,11 +57,27 @@ class TenantKomplainFragment : Fragment() {
 
         binding.tenantKomplainRV.adapter = adapter
         binding.tenantKomplainRV.layoutManager = layoutManager
+
+        binding.tenantKomplainAddKomplain.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setView(dialogTenantAddKomplainBinding.root)
+                .setTitle("Tambah Komplain")
+                .setPositiveButton("Tambah") { _, _ ->
+                    tenantKomplainViewModel.addComplain(
+                        dialogTenantAddKomplainBinding
+                            .dialogTenantAddKomplainKomplain
+                            .text
+                            .toString()
+                    )
+                }
+                .setNegativeButton("Batal", null)
+                .setCancelable(false)
+                .show()
+        }
     }
 
     private fun initObserver() {
         tenantKomplainViewModel.complains.observe(viewLifecycleOwner) {
-            Log.d("COmplains", it.toString())
             complains.clear()
             complains.addAll(it)
             adapter.notifyDataSetChanged()
@@ -98,9 +86,11 @@ class TenantKomplainFragment : Fragment() {
         tenantKomplainViewModel.isLoading.observe(viewLifecycleOwner) {
             if (it) {
                 binding.tenantKomplainRV.visibility = View.GONE
+                binding.tenantKomplainAddKomplain.visibility = View.GONE
                 binding.tenantKomplainLoading.visibility = View.VISIBLE
             } else {
                 binding.tenantKomplainRV.visibility = View.VISIBLE
+                binding.tenantKomplainAddKomplain.visibility = View.VISIBLE
                 binding.tenantKomplainLoading.visibility = View.GONE
             }
         }

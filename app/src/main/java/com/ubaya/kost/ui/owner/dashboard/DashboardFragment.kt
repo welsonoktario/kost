@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -48,6 +51,25 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.owner_dashboard_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.menu_catatan -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_catatan)
+                    R.id.menu_komplain -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_komplain)
+                    R.id.menu_message -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_chats)
+                    R.id.menu_notifications -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_notifications)
+                    R.id.menu_logout -> logout()
+                }
+
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         if (dashboardViewModel.kost.value == null && dashboardViewModel.roomTypes.value == null) {
             dashboardViewModel.loadData()
         }
@@ -63,23 +85,6 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.owner_dashboard_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_catatan -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_catatan)
-            R.id.menu_komplain -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_komplain)
-            R.id.menu_message -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_chats)
-            R.id.menu_notifications -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_notifications)
-            R.id.menu_logout -> logout()
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     @SuppressLint("UnsafeOptInUsageError")

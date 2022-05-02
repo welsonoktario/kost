@@ -109,7 +109,7 @@
     <fragment
         android:id="@+id/fragment_services"
         android:name="com.ubaya.kost.ui.owner.services.ServicesFragment"
-        android:label="Services"
+        android:label="Pengajuan Service"
         tools:layout="@layout/fragment_services" />
 
     <fragment
@@ -130,6 +130,6 @@
     <fragment
         android:id="@+id/fragment_transaksi"
         android:name="com.ubaya.kost.ui.owner.transaksi.TransaksiFragment"
-        android:label="Transaksi"
+        android:label="Riwayat Transaksi"
         tools:layout="@layout/fragment_transaksi" />
 </navigation>

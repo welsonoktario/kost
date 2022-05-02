@@ -77,7 +77,6 @@ class KomplainFragment : Fragment(), KomplainAdapter.ComplainListener {
 
     private fun initObserver() {
         komplainViewModel.complains.observe(viewLifecycleOwner) {
-            Log.d("Complains", it.toString())
             complains.clear()
             complains.addAll(it)
             adapter.notifyDataSetChanged()

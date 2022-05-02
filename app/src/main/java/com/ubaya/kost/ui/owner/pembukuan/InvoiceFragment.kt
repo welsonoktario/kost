@@ -1,16 +1,15 @@
 package com.ubaya.kost.ui.owner.pembukuan
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ubaya.kost.data.models.Invoice
 import com.ubaya.kost.databinding.FragmentInvoiceBinding
+import com.ubaya.kost.ui.shared.invoices.InvoiceAdapter
 
 class InvoiceFragment : Fragment(), InvoiceAdapter.InvoiceListener {
 
@@ -58,11 +57,17 @@ class InvoiceFragment : Fragment(), InvoiceAdapter.InvoiceListener {
 
     private fun initObserver() {
         pembukuanViewModel.invoices.observe(viewLifecycleOwner) {
-            Log.d("INVOICES", it.toString())
             invoices.clear()
             invoices.addAll(it)
 
             adapter.notifyDataSetChanged()
+
+            binding.invoiceEmpty.visibility =
+                if (!pembukuanViewModel.isLoading.value!! && invoices.isEmpty()) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
         }
     }
 }

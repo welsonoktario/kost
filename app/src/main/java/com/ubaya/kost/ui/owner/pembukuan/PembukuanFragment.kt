@@ -1,16 +1,25 @@
 package com.ubaya.kost.ui.owner.pembukuan
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.util.Pair
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.navGraphViewModels
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayoutMediator
-import com.ubaya.kost.R
 import com.ubaya.kost.databinding.FragmentPembukuanBinding
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class PembukuanFragment : Fragment() {
     private lateinit var adapter: PembukuanAdapter
+    private lateinit var dateRangePicker: MaterialDatePicker<Pair<Long, Long>>
 
     private var _binding: FragmentPembukuanBinding? = null
 
@@ -33,18 +42,9 @@ class PembukuanFragment : Fragment() {
         initView()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        inflater.inflate(R.menu.owner_pembukuan_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_add_pengeluaran -> {}
-        }
-
-        return super.onOptionsItemSelected(item)
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun initView() {
@@ -59,10 +59,45 @@ class PembukuanFragment : Fragment() {
                 else -> null
             }
         }.attach()
+
+        binding.pembukuanFilter.setOnClickListener {
+            openDateFilter()
+        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
+    private fun openDateFilter() {
+        if (!::dateRangePicker.isInitialized) {
+            dateRangePicker =
+                MaterialDatePicker.Builder.dateRangePicker()
+                    .setTitleText("Pilih tanggal mulai dan akhir")
+                    .setSelection(
+                        Pair(
+                            MaterialDatePicker.thisMonthInUtcMilliseconds(),
+                            MaterialDatePicker.todayInUtcMilliseconds()
+                        )
+                    )
+                    .build()
+
+            dateRangePicker.addOnPositiveButtonClickListener {
+                val tz = TimeZone.currentSystemDefault()
+                val df = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+                val startDate = Instant
+                    .fromEpochMilliseconds(it.first)
+                    .toLocalDateTime(tz)
+                    .toJavaLocalDateTime()
+                val endDate = Instant
+                    .fromEpochMilliseconds(it.second)
+                    .toLocalDateTime(tz)
+                    .toJavaLocalDateTime()
+                val start = startDate.format(df)
+                val end = endDate.format(df)
+
+                binding.pembukuanFilter.setText("$start - $end")
+                pembukuanViewModel.startDate.value = start
+                pembukuanViewModel.endDate.value = end
+            }
+        }
+
+        dateRangePicker.show(childFragmentManager, "DATE_FILTER")
     }
 }

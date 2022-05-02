@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ubaya.kost.data.models.Pengeluaran
 import com.ubaya.kost.databinding.CardPengeluaranBinding
+import com.ubaya.kost.util.NumberUtil
 
 class PengeluaranAdapter(private val data: ArrayList<Pengeluaran>) :
     RecyclerView.Adapter<PengeluaranAdapter.PengeluaranViewHolder>() {
@@ -15,7 +16,7 @@ class PengeluaranAdapter(private val data: ArrayList<Pengeluaran>) :
         fun bind(pengeluaran: Pengeluaran) {
             binding.cardPengeluaranDate.text = pengeluaran.date
             binding.cardPengeluaranDescription.text = pengeluaran.description
-            binding.cardPengeluaranTotal.text = pengeluaran.nominal.toString()
+            binding.cardPengeluaranTotal.text = NumberUtil().rupiah(pengeluaran.nominal)
         }
     }
 

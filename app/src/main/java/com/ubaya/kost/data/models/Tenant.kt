@@ -2,6 +2,7 @@ package com.ubaya.kost.data.models
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.ubaya.kost.util.NumberUtil
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
 import kotlinx.parcelize.Parcelize
@@ -19,7 +20,7 @@ data class Tenant(
     var dueDate: String?,
     var status: Boolean,
     val ktp: String,
-    val user: User
+    val user: User,
 ) : Parcelable {
 
     fun lamaMenyewa(): Int {
@@ -69,4 +70,15 @@ data class Tenant(
 
         return due.toJavaLocalDate().format(df)
     }
+
+    fun telat(): Int {
+        val tz = TimeZone.currentSystemDefault()
+        val due = LocalDate.parse(dueDate!!)
+        val currentDateTime = Clock.System.now().toLocalDateTime(tz).toString().split("T")
+        val currentDate = LocalDate.parse(currentDateTime[0])
+
+        return due.daysUntil(currentDate)
+    }
+
+    fun nominalTelat(nominal: Int) = NumberUtil().rupiah(telat() * nominal)
 }

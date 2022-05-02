@@ -56,6 +56,13 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
             tenantServices.clear()
             tenantServices.addAll(it)
             adapter.notifyDataSetChanged()
+
+            binding.serviceEmpty.visibility =
+                if (!serviceViewModel.isLoading.value!! && tenantServices.isEmpty()) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
         }
 
         serviceViewModel.isLoading.observe(viewLifecycleOwner) {
