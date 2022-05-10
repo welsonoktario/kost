@@ -12,9 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kost"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".TenantActivity"
-            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

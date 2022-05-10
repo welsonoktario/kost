@@ -17,7 +17,7 @@ class DendaAdapter(private val data: ArrayList<Tenant>, private val kost: Kost) 
             binding.cardDendaTenant.text = tenant.user.name
             binding.cardDendaTelat.text = "Telat membayar ${tenant.telat()} hari"
             binding.cardDendaNominal.text = kost.nominalDenda?.let { tenant.nominalTelat(it) }
-            binding.cardDendaRoom.text = tenant.id.toString()
+            binding.cardDendaRoom.text = tenant.room!!.noKamar.toString()
             binding.cardDendaTanggal.text = tenant.dueDate
         }
     }

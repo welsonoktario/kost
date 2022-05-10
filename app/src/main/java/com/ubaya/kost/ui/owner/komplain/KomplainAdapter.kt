@@ -29,7 +29,7 @@ class KomplainAdapter(
 
         fun bind(complain: Complain) {
             binding.cardComplainTenant.text = complain.tenant.user.name
-            binding.cardComplainNo.text = complain.tenant.id.toString()
+            binding.cardComplainNo.text = complain.tenant.room!!.noKamar.toString()
             binding.cardComplainDescription.text = complain.description
 
             when(complain.status) {

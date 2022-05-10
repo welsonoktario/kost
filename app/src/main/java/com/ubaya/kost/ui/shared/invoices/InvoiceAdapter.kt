@@ -25,7 +25,7 @@ class InvoiceAdapter(private val data: ArrayList<Invoice>, private val listener:
         fun bind(invoice: Invoice) {
             binding.cardInvoiceTenant.text = invoice.tenant.user.name
             binding.cardInvoiceDate.text = invoice.date
-            binding.cardInvoiceNo.text = invoice.tenant.id.toString()
+            binding.cardInvoiceNo.text = invoice.tenant.room!!.noKamar.toString()
             binding.cardInvoiceTotal.text = NumberUtil().rupiah(invoice.total)
         }
 

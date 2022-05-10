@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="16dp"
-            android:visibility="gone"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -124,19 +123,6 @@
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Services" />
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/addTenantChipGroupServices"
-                    style="@style/Widget.MaterialComponents.Chip.Choice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    app:singleLine="true" />
-
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/addTenantCardFoto"
                     android:layout_width="match_parent"
@@ -232,6 +218,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addTenantLoading"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:layout_height="match_parent">
 
             <ProgressBar

@@ -24,7 +24,7 @@ class RoomAdapter(private val data: ArrayList<Room>, val listener: RoomListener)
         }
 
         fun bind(room: Room) {
-            binding.cardDashboardRoomID.text = (adapterPosition + 1).toString()
+            binding.cardDashboardRoomID.text = room.noKamar.toString()
 
             if (room.tenant != null) {
                 binding.cardDashboardRoomLayout.setCardBackgroundColor(

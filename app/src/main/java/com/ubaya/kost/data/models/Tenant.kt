@@ -21,6 +21,7 @@ data class Tenant(
     var status: Boolean,
     val ktp: String,
     val user: User,
+    var room: Room? = null
 ) : Parcelable {
 
     fun lamaMenyewa(): Int {
