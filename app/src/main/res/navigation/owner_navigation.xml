@@ -96,7 +96,11 @@
         android:id="@+id/fragment_chat_room"
         android:name="com.ubaya.kost.ui.owner.chats.ChatRoomFragment"
         android:label="Chat Room"
-        tools:layout="@layout/fragment_chat_room" />
+        tools:layout="@layout/fragment_chat_room" >
+        <argument
+            android:name="chatRoom"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/fragment_detail_tenant"
         android:name="com.ubaya.kost.ui.owner.dashboard.tenant.DetailTenantFragment"
