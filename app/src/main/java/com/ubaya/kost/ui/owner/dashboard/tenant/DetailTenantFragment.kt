@@ -113,6 +113,14 @@ class DetailTenantFragment : Fragment() {
             binding.detailTenantTglMasuk.text = tenant.entryDate
             binding.detailTenantDue.text = tenant.dueDate
             binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
+
+            if (tenant.lamaMenyewa() <= 1) {
+                binding.btnKonfirm.isEnabled = false
+            }
+
+            if (tenant.diffFromDue() >= 15) {
+                binding.btnKonfirm.isEnabled = false
+            }
         }
 
         tenantViewModel.total.observe(viewLifecycleOwner) {

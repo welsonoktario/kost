@@ -1,12 +1,8 @@
 package com.ubaya.kost
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -52,7 +48,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_pembukuan,
                 R.id.fragment_denda,
                 R.id.fragment_transaksi,
-                R.id.fragment_tenant_home,
+                R.id.fragment_tenant_home
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -70,8 +66,9 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_add_tenant -> navView.visibility = View.GONE
                 R.id.fragment_tenant_home -> navView.visibility = View.GONE
                 R.id.fragment_tenant_notification -> navView.visibility = View.GONE
-                R.id.fragment_tenant_message -> navView.visibility = View.GONE
                 R.id.fragment_tenant_komplain -> navView.visibility = View.GONE
+                R.id.fragment_tenant_chat_room -> navView.visibility = View.GONE
+                R.id.fragment_tenant_service -> navView.visibility = View.GONE
                 else -> navView.visibility = View.VISIBLE
             }
         }
@@ -103,7 +100,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     override fun newImageLoader(): ImageLoader {

@@ -81,7 +81,7 @@
     <fragment
         android:id="@+id/fragment_chats"
         android:name="com.ubaya.kost.ui.owner.chats.ChatsFragment"
-        android:label="fragment_chats"
+        android:label="Message"
         tools:layout="@layout/fragment_chats">
         <action
             android:id="@+id/action_fragment_chats_to_fragment_chat_room"
@@ -94,11 +94,14 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_chat_room"
-        android:name="com.ubaya.kost.ui.owner.chats.ChatRoomFragment"
-        android:label="Chat Room"
-        tools:layout="@layout/fragment_chat_room" >
+        android:name="com.ubaya.kost.ui.shared.chats.ChatRoomFragment"
+        android:label="Message Room"
+        tools:layout="@layout/fragment_chat_room">
         <argument
-            android:name="chatRoom"
+            android:name="kost"
+            app:argType="integer" />
+        <argument
+            android:name="tenant"
             app:argType="integer" />
     </fragment>
     <fragment

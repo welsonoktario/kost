@@ -16,30 +16,33 @@
             app:enterAnim="@anim/grow_fade_in"
             app:exitAnim="@anim/shrink_fade_out"
             app:popEnterAnim="@anim/grow_fade_in"
-            app:popExitAnim="@anim/shrink_fade_out" />
-        <action
-            android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_message"
-            app:destination="@id/fragment_tenant_message"
-            app:enterAnim="@anim/grow_fade_in"
-            app:exitAnim="@anim/shrink_fade_out"
-            app:popEnterAnim="@anim/grow_fade_in"
-            app:popExitAnim="@anim/shrink_fade_out" />
+            app:popExitAnim="@anim/shrink_fade_out"
+            app:popUpTo="@id/fragment_tenant_home" />
         <action
             android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_service"
             app:destination="@id/fragment_tenant_service"
             app:enterAnim="@anim/grow_fade_in"
             app:exitAnim="@anim/shrink_fade_out"
             app:popEnterAnim="@anim/grow_fade_in"
-            app:popExitAnim="@anim/shrink_fade_out" />
+            app:popExitAnim="@anim/shrink_fade_out"
+            app:popUpTo="@id/fragment_tenant_home" />
         <action
             android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_komplain"
-            app:destination="@id/fragment_tenant_komplain" />
+            app:destination="@id/fragment_tenant_komplain"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
+            app:popUpTo="@id/fragment_tenant_home" />
+        <action
+            android:id="@+id/action_fragment_tenant_home_to_fragment_tenant_chat_room"
+            app:destination="@id/fragment_tenant_chat_room"
+            app:enterAnim="@anim/grow_fade_in"
+            app:exitAnim="@anim/shrink_fade_out"
+            app:popEnterAnim="@anim/grow_fade_in"
+            app:popExitAnim="@anim/shrink_fade_out"
+            app:popUpTo="@id/fragment_tenant_home" />
     </fragment>
-    <fragment
-        android:id="@+id/fragment_tenant_message"
-        android:name="com.ubaya.kost.ui.tenant.message.TenantMessageFragment"
-        android:label="Messages"
-        tools:layout="@layout/fragment_tenant_message" />
     <fragment
         android:id="@+id/fragment_tenant_notification"
         android:name="com.ubaya.kost.ui.shared.notifications.NotificationsFragment"
@@ -55,4 +58,16 @@
         android:name="com.ubaya.kost.ui.tenant.komplain.TenantKomplainFragment"
         android:label="Komplain"
         tools:layout="@layout/fragment_tenant_komplain" />
+    <fragment
+        android:id="@+id/fragment_tenant_chat_room"
+        android:name="com.ubaya.kost.ui.shared.chats.ChatRoomFragment"
+        android:label="Chat Room"
+        tools:layout="@layout/fragment_chat_room">
+        <argument
+            android:name="kost"
+            app:argType="integer" />
+        <argument
+            android:name="tenant"
+            app:argType="integer" />
+    </fragment>
 </navigation>

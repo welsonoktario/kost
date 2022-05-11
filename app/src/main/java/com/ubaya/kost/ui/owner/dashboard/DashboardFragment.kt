@@ -42,10 +42,9 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setHasOptionsMenu(true)
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
 
-        return binding.root
+        return _binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

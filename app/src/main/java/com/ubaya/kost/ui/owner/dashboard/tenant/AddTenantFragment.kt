@@ -123,6 +123,7 @@ class AddTenantFragment : Fragment() {
 
         binding.addTenantInputDurasi.setSelection(0)
         binding.addTenantInputDurasi.setText(durasiText[0], false)
+        selectedDurasi = durasi.keys.toList()[0]
         binding.addTenantInputDurasi.setOnItemClickListener { _, _, position, _ ->
             selectedDurasi = durasi.keys.toList()[position]
         }

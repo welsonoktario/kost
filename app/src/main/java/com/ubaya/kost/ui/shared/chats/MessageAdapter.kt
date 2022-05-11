@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.chats
+package com.ubaya.kost.ui.shared.chats
 
 import android.view.LayoutInflater
 import android.view.View
@@ -14,13 +14,20 @@ class MessageAdapter(private val data: ArrayList<Message>, private val type: Str
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(message: Message) {
-            if (message.isOwner && type == "Owner" || type == "Tenant") {
+            if (message.isOwner && type == "Owner") {
                 binding.cardMessageIsEnd.visibility = View.VISIBLE
                 binding.cardMessageUser.visibility = View.GONE
             } else if (!message.isOwner && type == "Owner") {
                 binding.cardMessageIsEnd.visibility = View.GONE
                 binding.cardMessageUser.visibility = View.VISIBLE
                 binding.cardMessageUser.text = message.tenant!!.user.name
+            } else if (message.isOwner && type == "Tenant") {
+                binding.cardMessageIsEnd.visibility = View.GONE
+                binding.cardMessageUser.visibility = View.VISIBLE
+                binding.cardMessageUser.text = "Owner"
+            } else if (!message.isOwner && type == "Tenant") {
+                binding.cardMessageIsEnd.visibility = View.VISIBLE
+                binding.cardMessageUser.visibility = View.GONE
             }
 
             binding.cardMessageMessage.text = message.message

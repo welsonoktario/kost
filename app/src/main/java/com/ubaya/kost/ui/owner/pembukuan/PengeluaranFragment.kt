@@ -16,7 +16,7 @@ import com.ubaya.kost.databinding.FragmentPengeluaranBinding
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
 
 class PengeluaranFragment : Fragment() {
 
@@ -34,7 +34,7 @@ class PengeluaranFragment : Fragment() {
         }
     )
     private val tz = TimeZone.currentSystemDefault()
-    val df: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+    private val df: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.chats
+package com.ubaya.kost.ui.owner.catatan
 
 import android.app.Application
 import android.util.Log
@@ -9,37 +9,32 @@ import androidx.lifecycle.viewModelScope
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
-import com.ubaya.kost.data.models.ChatRoom
-import com.ubaya.kost.data.models.Error
-import com.ubaya.kost.data.models.Message
+import com.ubaya.kost.data.models.Catatan
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
-
+class CatatanViewModel(private val app: Application) : AndroidViewModel(app) {
     val isLoading = MutableLiveData<Boolean>()
-    val error = MutableLiveData(Error())
+    val isError = MutableLiveData<Boolean>()
+    val msg = MutableLiveData<String>()
 
-    private val _chatRooms = MutableLiveData<ArrayList<ChatRoom>>(arrayListOf())
-    val chatRooms: LiveData<ArrayList<ChatRoom>> = _chatRooms
+    private val _catatans = MutableLiveData<ArrayList<Catatan>>(arrayListOf())
+    val catatans: LiveData<ArrayList<Catatan>> = _catatans
 
-    private val _messages = MutableLiveData<ArrayList<Message>>(arrayListOf())
-    val messages: LiveData<ArrayList<Message>> = _messages
-
-    fun loadChatRooms() {
+    fun loadCatatan() {
         isLoading.value = true
-        error.value = Error(false, "")
+        isError.value = false
         val kost = Global.authKost
-        val url = "${VolleyClient.API_URL}/chats/${kost.id}"
+        val url = "${VolleyClient.API_URL}/catatans?kost=${kost.id}"
 
         viewModelScope.launch {
             val request = object : JsonObjectRequest(
                 url,
                 { res ->
                     isLoading.value = false
-                    _chatRooms.value = Gson().fromJson(res.getString("data"))
+                    _catatans.value = Gson().fromJson(res.getString("data"))
                 },
                 { err ->
                     Log.d("ERR", String(err.networkResponse.data))
@@ -47,7 +42,8 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
 
                     try {
                         val data = JSONObject(String(err.networkResponse.data))
-                        error.value = Error(true, data.getString("msg"))
+                        isError.value = true
+                        msg.value = data.getString("msg")
                     } catch (e: Exception) {
                         Log.e("ERR", e.message.toString())
                     }
@@ -62,46 +58,15 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun loadMessages(tenant: Int) {
+    fun addCatatan(description: String, date: String) {
         isLoading.value = true
-        error.value = Error(false, "")
+        isError.value = false
         val kost = Global.authKost
-        val url = "${VolleyClient.API_URL}/chats?kost=${kost.id}&tenant=$tenant"
-
-        viewModelScope.launch {
-            val request = object : JsonObjectRequest(
-                url,
-                { res ->
-                    isLoading.value = false
-                    _messages.value = Gson().fromJson(res.getString("data"))
-                },
-                { err ->
-                    Log.d("ERR", String(err.networkResponse.data))
-                    isLoading.value = false
-
-                    try {
-                        val data = JSONObject(String(err.networkResponse.data))
-                        error.value = Error(true, data.getString("msg"))
-                    } catch (e: Exception) {
-                        Log.e("ERR", e.message.toString())
-                    }
-                }
-            ) {
-                override fun getHeaders() = hashMapOf(
-                    "Authorization" to "Bearer ${Global.authToken}"
-                )
-            }
-
-            VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
-        }
-    }
-
-    fun addMessage(id: Int, message: String) {
-        isLoading.value = true
-        error.value = Error(false, "")
-        val url = "${VolleyClient.API_URL}/chats/$id"
+        val url = "${VolleyClient.API_URL}/catatans"
         val params = JSONObject()
-        params.put("message", message)
+        params.put("kost", kost.id)
+        params.put("description", description)
+        params.put("date", date)
 
         viewModelScope.launch {
             val request = object : JsonObjectRequest(
@@ -110,9 +75,8 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
                 params,
                 { res ->
                     isLoading.value = false
-                    val msg: Message = Gson().fromJson(res.getString("data"))
-                    _messages.value = _messages.value!!.apply {
-                        this.add(msg)
+                    _catatans.value = _catatans.value!!.apply {
+                        this.add(0, Gson().fromJson(res.getString("data")))
                     }
                 },
                 { err ->
@@ -121,7 +85,8 @@ class ChatViewModel(private val app: Application) : AndroidViewModel(app) {
 
                     try {
                         val data = JSONObject(String(err.networkResponse.data))
-                        error.value = Error(true, data.getString("msg"))
+                        isError.value = true
+                        msg.value = data.getString("msg")
                     } catch (e: Exception) {
                         Log.e("ERR", e.message.toString())
                     }

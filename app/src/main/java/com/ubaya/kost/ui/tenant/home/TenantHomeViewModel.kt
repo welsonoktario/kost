@@ -10,10 +10,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.ubaya.kost.data.Global
-import com.ubaya.kost.data.models.Error
-import com.ubaya.kost.data.models.Room
-import com.ubaya.kost.data.models.RoomType
-import com.ubaya.kost.data.models.Service
+import com.ubaya.kost.data.models.*
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch

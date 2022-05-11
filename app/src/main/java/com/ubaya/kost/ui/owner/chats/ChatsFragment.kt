@@ -9,9 +9,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.ChatRoom
 import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.databinding.FragmentChatsBinding
+import com.ubaya.kost.ui.shared.chats.ChatViewModel
 
 class ChatsFragment : Fragment(), ChatRoomAdapter.CardChatRoomListener {
     private lateinit var chatRooms: ArrayList<ChatRoom>
@@ -39,8 +41,14 @@ class ChatsFragment : Fragment(), ChatRoomAdapter.CardChatRoomListener {
         initView()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun initView() {
         chatRooms = chatViewModel.chatRooms.value!!
+        adapter = ChatRoomAdapter(chatRooms, this)
         binding.chatRV.let {
             it.adapter = adapter
             it.layoutManager = LinearLayoutManager(requireContext())
@@ -83,8 +91,10 @@ class ChatsFragment : Fragment(), ChatRoomAdapter.CardChatRoomListener {
     }
 
     override fun onCardClicked(position: Int) {
-        val id = chatRooms[position].id
-        val action = ChatsFragmentDirections.actionFragmentChatsToFragmentChatRoom(id)
+        val kost = Global.authKost
+        val tenant = chatRooms[position].tenant
+        val action =
+            ChatsFragmentDirections.actionFragmentChatsToFragmentChatRoom(kost.id!!, tenant.id)
         findNavController().navigate(action)
     }
 }

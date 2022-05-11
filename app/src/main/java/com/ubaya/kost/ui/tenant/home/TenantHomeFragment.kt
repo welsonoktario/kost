@@ -5,7 +5,10 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import coil.load
@@ -24,6 +27,7 @@ import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.observeOnce
 
 class TenantHomeFragment : Fragment() {
+
     private var _binding: FragmentTenantHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -31,23 +35,43 @@ class TenantHomeFragment : Fragment() {
     private lateinit var dialogFoto: AlertDialog
     private lateinit var notifCountBadge: BadgeDrawable
 
-    private val tenantViewModel: TenantHomeViewModel by navGraphViewModels(R.id.mobile_navigation)
+    private val tenantViewModel by navGraphViewModels<TenantHomeViewModel>(R.id.mobile_navigation)
     private val notificationsViewModel by navGraphViewModels<NotificationsViewModel>(R.id.mobile_navigation)
 
     private val user = Global.authUser
     private val tenant = Global.authTenant
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setHasOptionsMenu(true)
         _binding = FragmentTenantHomeBinding.inflate(inflater, container, false)
         return _binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.tenant_home_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.menu_tenant_notifications -> findNavController().navigate(
+                        R.id.action_fragment_tenant_home_to_fragment_tenant_notification
+                    )
+                    R.id.menu_tenant_message -> openChat()
+                    R.id.menu_tenant_logout -> logout()
+                }
+
+                return true
+            }
+
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         if (tenantViewModel.roomType.value == null) {
             tenantViewModel.loadDetailTenant(tenant.id)
@@ -92,10 +116,23 @@ class TenantHomeFragment : Fragment() {
 
             if (count > 0) {
                 notifCountBadge.number = count
-                BadgeUtils.attachBadgeDrawable(notifCountBadge, toolbar, R.id.menu_tenant_notifications)
+                BadgeUtils.attachBadgeDrawable(
+                    notifCountBadge,
+                    toolbar,
+                    R.id.menu_tenant_notifications
+                )
             } else {
-                BadgeUtils.detachBadgeDrawable(notifCountBadge, toolbar, R.id.menu_tenant_notifications)
+                BadgeUtils.detachBadgeDrawable(
+                    notifCountBadge,
+                    toolbar,
+                    R.id.menu_tenant_notifications
+                )
             }
+        }
+
+        if (tenant.lamaMenyewa() <= 1) {
+            binding.btnHomeTenantKomplain.isEnabled = false
+            binding.btnHomeTenantService.isEnabled = false
         }
     }
 
@@ -129,25 +166,6 @@ class TenantHomeFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.tenant_home_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_tenant_notifications -> findNavController().navigate(
-                R.id.action_fragment_tenant_home_to_fragment_tenant_notification
-            )
-            R.id.menu_tenant_message -> findNavController().navigate(
-                R.id.action_fragment_tenant_home_to_fragment_tenant_notification
-            )
-            R.id.menu_tenant_logout -> logout()
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun fotoIdentitas() {
         if (!this::dialogFotoBinding.isInitialized) {
             dialogFotoBinding = DialogFotoBinding.inflate(layoutInflater, binding.root, false)
@@ -170,5 +188,16 @@ class TenantHomeFragment : Fragment() {
 
         findNavController().popBackStack(R.id.fragment_tenant_home, true)
         findNavController().navigate(R.id.fragment_login)
+    }
+
+    private fun openChat() {
+        val kost = Global.authKost
+        val tenant = Global.authTenant
+        val action =
+            TenantHomeFragmentDirections.actionFragmentTenantHomeToFragmentTenantChatRoom(
+                kost.id!!,
+                tenant.id
+            )
+        findNavController().navigate(action)
     }
 }

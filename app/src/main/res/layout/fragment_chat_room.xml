@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.owner.chats.ChatRoomFragment">
+    tools:context=".ui.shared.chats.ChatRoomFragment">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/chatRoomLoading"
@@ -31,7 +31,7 @@
         android:id="@+id/chatRoomEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Data chat kosong"
+        android:text="Belum ada pesan"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +45,6 @@
         android:layout_marginHorizontal="8dp"
         android:layout_marginBottom="8dp"
         android:orientation="horizontal"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -63,16 +62,32 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/chatRoomSend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
-            android:background="?selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_round_send_24"
-            app:tint="@color/primary" />
+            app:cardBackgroundColor="@color/primary"
+            app:cardCornerRadius="999dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:src="@drawable/ic_round_send_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/white" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
