@@ -8,5 +8,6 @@ import kotlinx.parcelize.Parcelize
 data class Room(
     val id: Int,
     @SerializedName("no_kamar") val noKamar: Int,
-    var tenant: Tenant? = null
+    var tenant: Tenant? = null,
+    var roomType: RoomType? = null
 ) : Parcelable

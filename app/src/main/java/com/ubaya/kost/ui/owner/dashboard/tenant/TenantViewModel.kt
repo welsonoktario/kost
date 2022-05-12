@@ -97,13 +97,17 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
                     _additionals.value = Gson().fromJson(tenant.getString("additionals"))
                 },
                 { err ->
-                    val data = JSONObject(String(err.networkResponse.data))
+                    try {
+                        val data = JSONObject(String(err.networkResponse.data))
 
-                    isLoading.value = false
-                    newError.isError = true
-                    newError.msg = data.getString("msg")
+                        isLoading.value = false
+                        newError.isError = true
+                        newError.msg = data.getString("msg")
 
-                    error.value = newError
+                        error.value = newError
+                    } catch (e: Exception) {
+                        Log.e("ERR", e.message.toString())
+                    }
                 }
             ) {
                 override fun getHeaders() = hashMapOf(
@@ -112,12 +116,6 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
             }
 
             VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
-        }
-    }
-
-    fun konfirmasiPembayaran() {
-        _tenant.value = _tenant.value!!.apply {
-            this.perpanjangan(1)
         }
     }
 }

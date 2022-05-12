@@ -112,6 +112,14 @@
         <argument
             android:name="room"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_fragment_detail_tenant_to_fragment_chat_room"
+            app:destination="@id/fragment_chat_room"
+            app:popUpTo="@id/fragment_detail_tenant" />
+        <action
+            android:id="@+id/action_fragment_detail_tenant_to_fragment_edit_tenant"
+            app:destination="@id/fragment_edit_tenant"
+            app:popUpTo="@id/fragment_detail_tenant" />
     </fragment>
     <fragment
         android:id="@+id/fragment_services"
@@ -139,4 +147,9 @@
         android:name="com.ubaya.kost.ui.owner.transaksi.TransaksiFragment"
         android:label="Riwayat Transaksi"
         tools:layout="@layout/fragment_transaksi" />
+    <fragment
+        android:id="@+id/fragment_edit_tenant"
+        android:name="com.ubaya.kost.ui.owner.dashboard.tenant.EditTenantFragment"
+        android:label="fragment_edit_tenant"
+        tools:layout="@layout/fragment_edit_tenant" />
 </navigation>

@@ -93,6 +93,7 @@ class TenantHomeFragment : Fragment() {
         binding.homeTenantPhone.text = user.phone
         binding.homeTenantTglMasuk.text = tenant.entryDate
         binding.homeTenantDue.text = tenant.dueDate
+        binding.homeTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
 
         if (tenant.diffFromDue() >= 7) {
             binding.tenantHomeCardTagihan.visibility = View.GONE

@@ -95,6 +95,7 @@ class PembukuanFragment : Fragment() {
                 binding.pembukuanFilter.setText("$start - $end")
                 pembukuanViewModel.startDate.value = start
                 pembukuanViewModel.endDate.value = end
+                pembukuanViewModel.loadPembukuan()
             }
         }
 

@@ -20,7 +20,7 @@ data class Tenant(
     var dueDate: String?,
     var status: Boolean,
     val ktp: String,
-    val user: User,
+    var user: User,
     var room: Room? = null
 ) : Parcelable {
 

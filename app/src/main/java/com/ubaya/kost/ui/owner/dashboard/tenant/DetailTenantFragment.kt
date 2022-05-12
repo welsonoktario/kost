@@ -25,7 +25,6 @@ import com.ubaya.kost.databinding.*
 import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
 import com.ubaya.kost.util.NumberUtil
 import com.ubaya.kost.util.VolleyClient
-import com.ubaya.kost.util.fromJson
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -87,6 +86,14 @@ class DetailTenantFragment : Fragment() {
 
         binding.btnHapus.setOnClickListener {
             btnHapus()
+        }
+
+        binding.btnPesan.setOnClickListener {
+            sendMessage()
+        }
+
+        binding.btnBiodata.setOnClickListener {
+            findNavController().navigate(R.id.action_fragment_detail_tenant_to_fragment_edit_tenant)
         }
     }
 
@@ -529,5 +536,15 @@ class DetailTenantFragment : Fragment() {
         }
 
         VolleyClient.getInstance(requireContext()).addToRequestQueue(request)
+    }
+
+    private fun sendMessage() {
+        val kost = Global.authKost
+        val action =
+            DetailTenantFragmentDirections.actionFragmentDetailTenantToFragmentChatRoom(
+                kost.id!!,
+                tenant.id
+            )
+        findNavController().navigate(action)
     }
 }

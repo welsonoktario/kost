@@ -70,7 +70,8 @@ class NotificationsViewModel(private val app: Application) : AndroidViewModel(ap
                 { res ->
                     error.value = Error(false, "")
                     _notifications.value = _notifications.value!!.apply {
-                        this[position].isRead = true
+                        notification.isRead = true
+                        this[position] = notification
                     }
                 },
                 { err ->

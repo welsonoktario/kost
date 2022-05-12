@@ -44,6 +44,7 @@ class PembukuanViewModel(private val app: Application) : AndroidViewModel(app) {
             val request = object : JsonObjectRequest(
                 url,
                 { res ->
+                    Log.d("INVOICES", res.toString())
                     isLoading.value = false
                     val data = res.getJSONObject("data")
                     _invoices.value = Gson().fromJson(data.getString("invoices"))
