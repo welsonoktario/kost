@@ -267,7 +267,7 @@
                 app:cardElevation="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tenantHomeCardTagihan">
+                app:layout_constraintTop_toBottomOf="@+id/detailTenantCardTagihan">
 
                 <GridLayout
                     android:layout_width="match_parent"
