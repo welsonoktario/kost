@@ -123,8 +123,10 @@ class DetailTenantFragment : Fragment() {
             if (tenant.lamaMenyewa() <= 1) {
                 binding.btnKonfirm.isEnabled = false
                 binding.btnTambah.isEnabled = false
+                binding.detailTenantCardTagihan.visibility = View.GONE
                 binding.detailTenantDue.text = "-"
             } else {
+                binding.detailTenantCardTagihan.visibility = View.VISIBLE
                 binding.detailTenantDue.text = tenant.dueDate
             }
 
@@ -146,7 +148,6 @@ class DetailTenantFragment : Fragment() {
         }
 
         tenantViewModel.additionals.observe(viewLifecycleOwner) {
-            Log.d("adds", it.toString())
             if (it.isEmpty()) {
                 binding.detailTenantAddsNull.visibility = View.VISIBLE
                 binding.detailTenantAdds.removeAllViews()

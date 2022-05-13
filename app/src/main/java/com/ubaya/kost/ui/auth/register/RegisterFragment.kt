@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
@@ -154,18 +155,24 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
         val url = VolleyClient.API_URL + "/auth/register"
         val request = JsonObjectRequest(Request.Method.POST, url, params2,
             { res ->
-                val data = res.getJSONObject("data")
-                val user = gson.fromJson(data.get("user").toString(), User::class.java)
-                kost.user = user
+                val data = JSONObject(res["data"].toString())
+                val dataUser = data.getJSONObject("user")
+                val user = Gson().fromJson(dataUser.toString(), User::class.java)
+                val token = data["token"].toString()
+
+                val kosts = dataUser.getJSONArray("kost")
+                val kost = Gson().fromJson(kosts[0].toString(), Kost::class.java)
 
                 pref.apply {
                     authUser = user
-                    authToken = data.get("token").toString()
+                    authToken = token
+                    authKost = kost
                 }
 
                 Global.apply {
                     authUser = user
-                    authToken = data.get("token").toString()
+                    authToken = token
+                    authKost = kost
                 }
 
                 findNavController().navigate(R.id.action_navigation_register_to_owner_navigation)

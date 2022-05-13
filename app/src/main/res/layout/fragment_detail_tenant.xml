@@ -169,7 +169,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/tenantHomeCardTagihan"
+                android:id="@+id/detailTenantCardTagihan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
