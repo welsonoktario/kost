@@ -3,6 +3,7 @@ package com.ubaya.kost.ui.tenant.home
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
@@ -95,8 +96,11 @@ class TenantHomeFragment : Fragment() {
         binding.homeTenantDue.text = tenant.dueDate
         binding.homeTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
 
-        if (tenant.diffFromDue() >= 7) {
+        Log.d("tenant.diffFromDue()", tenant.diffFromDue().toString())
+        if (tenant.diffFromDue() > 7) {
             binding.tenantHomeCardTagihan.visibility = View.GONE
+        } else {
+            binding.tenantHomeCardTagihan.visibility = View.VISIBLE
         }
 
         binding.btnFoto.setOnClickListener {
