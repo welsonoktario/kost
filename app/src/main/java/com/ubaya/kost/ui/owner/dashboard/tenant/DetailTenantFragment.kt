@@ -118,12 +118,14 @@ class DetailTenantFragment : Fragment() {
             binding.detailTenantNama.text = tenant.user.name
             binding.detailTenantPhone.text = tenant.user.phone
             binding.detailTenantTglMasuk.text = tenant.entryDate
-            binding.detailTenantDue.text = tenant.dueDate
             binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
 
             if (tenant.lamaMenyewa() <= 1) {
                 binding.btnKonfirm.isEnabled = false
                 binding.btnTambah.isEnabled = false
+                binding.detailTenantDue.text = "-"
+            } else {
+                binding.detailTenantDue.text = tenant.dueDate
             }
 
             if (tenant.diffFromDue() >= 15) {
@@ -178,7 +180,6 @@ class DetailTenantFragment : Fragment() {
         }
 
         tenantViewModel.services.observe(viewLifecycleOwner) {
-            Log.d("services", it.toString())
             if (it.isEmpty()) {
                 binding.detailTenantServiceNull.visibility = View.VISIBLE
                 binding.detailTenantService.removeAllViews()
