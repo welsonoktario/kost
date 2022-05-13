@@ -132,7 +132,6 @@ class TenantHomeFragment : Fragment() {
         }
 
         if (tenant.lamaMenyewa() <= 1) {
-            binding.btnHomeTenantKomplain.isEnabled = false
             binding.btnHomeTenantService.isEnabled = false
         }
     }

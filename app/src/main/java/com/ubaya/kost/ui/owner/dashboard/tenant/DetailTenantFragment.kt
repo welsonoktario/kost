@@ -123,6 +123,7 @@ class DetailTenantFragment : Fragment() {
 
             if (tenant.lamaMenyewa() <= 1) {
                 binding.btnKonfirm.isEnabled = false
+                binding.btnTambah.isEnabled = false
             }
 
             if (tenant.diffFromDue() >= 15) {
