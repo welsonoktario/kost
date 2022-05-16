@@ -64,7 +64,7 @@ class DendaViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun updateDenda(nominal: Int, interval: Int) {
+    fun updateDenda(nominal: Int, interval: Int, berlaku: Int) {
         isLoading.value = true
         error.value = Error(false, "")
         val kost = Global.authKost
@@ -72,6 +72,7 @@ class DendaViewModel(private val app: Application) : AndroidViewModel(app) {
         val params = JSONObject()
         params.put("nominal", nominal)
         params.put("interval", interval)
+        params.put("berlaku", berlaku)
 
         viewModelScope.launch {
             val request = object : JsonObjectRequest(
@@ -84,6 +85,7 @@ class DendaViewModel(private val app: Application) : AndroidViewModel(app) {
                     Global.authKost.apply {
                         this.intervalDenda = interval
                         this.nominalDenda = nominal
+                        this.dendaBerlaku = berlaku
                     }
                     _kost.value = Global.authKost
                     prefs.authKost = Global.authKost

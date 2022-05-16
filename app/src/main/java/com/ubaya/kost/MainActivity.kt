@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_chat_room -> navView.visibility = View.GONE
                 R.id.fragment_detail_tenant -> navView.visibility = View.GONE
                 R.id.fragment_add_tenant -> navView.visibility = View.GONE
+                R.id.fragment_edit_tenant -> navView.visibility = View.GONE
                 R.id.fragment_tenant_home -> navView.visibility = View.GONE
                 R.id.fragment_tenant_notification -> navView.visibility = View.GONE
                 R.id.fragment_tenant_komplain -> navView.visibility = View.GONE

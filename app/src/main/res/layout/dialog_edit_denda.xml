@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingHorizontal="24dp"
     android:paddingVertical="8dp">
@@ -19,8 +19,8 @@
             android:text="Denda: " />
 
         <TextView
-            style="@style/TextAppearance.MaterialComponents.Body2"
             android:id="@+id/dialogDendaNominalText"
+            style="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
@@ -34,8 +34,8 @@
             android:text="/" />
 
         <TextView
-            style="@style/TextAppearance.MaterialComponents.Body2"
             android:id="@+id/dialogDendaIntervalText"
+            style="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="2dp"
@@ -60,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:text="0"/>
+            android:text="0" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -77,4 +77,23 @@
             android:layout_height="wrap_content"
             android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1"
+        android:hint="Denda berlaku setelah"
+        app:suffixText="hari">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/dialogDendaBerlaku"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="3" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 </LinearLayout>

@@ -130,7 +130,7 @@ class DetailTenantFragment : Fragment() {
                 binding.detailTenantDue.text = tenant.dueDate
             }
 
-            if (tenant.diffFromDue() <= 15) {
+            if (tenant.diffFromDue() >= 15) {
                 binding.btnKonfirm.isEnabled = false
             }
         }

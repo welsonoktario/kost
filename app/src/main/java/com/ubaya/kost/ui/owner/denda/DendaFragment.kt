@@ -14,7 +14,7 @@ import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.Tenant
-import com.ubaya.kost.databinding.DialogDendaPengaturanBinding
+import com.ubaya.kost.databinding.DialogEditDendaBinding
 import com.ubaya.kost.databinding.FragmentDendaBinding
 import com.ubaya.kost.util.NumberUtil
 
@@ -24,7 +24,7 @@ class DendaFragment : Fragment() {
     private lateinit var dialog: AlertDialog
 
     private var _binding: FragmentDendaBinding? = null
-    private var _dialogBinding: DialogDendaPengaturanBinding? = null
+    private var _dialogBinding: DialogEditDendaBinding? = null
 
     private val binding get() = _binding!!
     private val dialogBinding get() = _dialogBinding!!
@@ -37,7 +37,7 @@ class DendaFragment : Fragment() {
     ): View {
         dendaViewModel.loadDenda()
         _binding = FragmentDendaBinding.inflate(inflater, container, false)
-        _dialogBinding = DialogDendaPengaturanBinding.inflate(inflater, container, false)
+        _dialogBinding = DialogEditDendaBinding.inflate(inflater, container, false)
 
         return _binding!!.root
     }
@@ -99,6 +99,7 @@ class DendaFragment : Fragment() {
 
             dialogBinding.dialogDendaIntervalText.text = kost.intervalDenda.toString()
             dialogBinding.dialogDendaInterval.setText(kost.intervalDenda.toString())
+            dialogBinding.dialogDendaBerlaku.setText(kost.dendaBerlaku.toString())
         }
 
         dendaViewModel.isLoading.observe(viewLifecycleOwner) {
@@ -146,7 +147,8 @@ class DendaFragment : Fragment() {
     private fun updateDenda() {
         val nominal = dialogBinding.dialogDendaNominal.text.toString().toInt()
         val interval = dialogBinding.dialogDendaInterval.text.toString().toInt()
+        val berlaku = dialogBinding.dialogDendaBerlaku.text.toString().toInt()
 
-        dendaViewModel.updateDenda(nominal, interval)
+        dendaViewModel.updateDenda(nominal, interval, berlaku)
     }
 }

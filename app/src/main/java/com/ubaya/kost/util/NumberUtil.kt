@@ -4,7 +4,7 @@ import java.text.NumberFormat
 import java.util.*
 
 class NumberUtil {
-    fun rupiah(nominal: Int): String {
+    fun rupiah(nominal: Double): String {
         val formatter: NumberFormat = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
         val result = formatter.format(nominal)
 

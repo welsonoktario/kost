@@ -8,6 +8,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.parcelize.Parcelize
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 @Parcelize
 data class Tenant(
@@ -23,7 +25,6 @@ data class Tenant(
     var user: User,
     var room: Room? = null
 ) : Parcelable {
-
     fun lamaMenyewa(): Int {
         val entry = LocalDate.parse(entryDate)
         val leave = LocalDate.parse(leaveDate!!)
@@ -63,14 +64,14 @@ data class Tenant(
         return due.toJavaLocalDate().format(df)
     }
 
-    fun telat(): Int {
+    fun telat(dendaBerlaku: Int): Int {
         val tz = TimeZone.currentSystemDefault()
         val due = LocalDate.parse(dueDate!!)
         val currentDateTime = Clock.System.now().toLocalDateTime(tz).toString().split("T")
         val currentDate = LocalDate.parse(currentDateTime[0])
 
-        return due.daysUntil(currentDate)
+        return due.plus(DatePeriod(0, 0, dendaBerlaku)).daysUntil(currentDate)
     }
 
-    fun nominalTelat(nominal: Int) = NumberUtil().rupiah(telat() * nominal)
+    fun nominalTelat(kost: Kost) = NumberUtil().rupiah(ceil((telat(kost.dendaBerlaku!!) / kost.intervalDenda!!).toDouble()) * kost.nominalDenda!!)
 }

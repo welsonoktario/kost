@@ -150,6 +150,6 @@
     <fragment
         android:id="@+id/fragment_edit_tenant"
         android:name="com.ubaya.kost.ui.owner.dashboard.tenant.EditTenantFragment"
-        android:label="fragment_edit_tenant"
+        android:label="Ubah Biodata"
         tools:layout="@layout/fragment_edit_tenant" />
 </navigation>

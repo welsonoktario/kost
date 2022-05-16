@@ -11,5 +11,6 @@ data class Kost(
     val address: String? = null,
     var user: User? = null,
     @SerializedName("nominal_denda") var nominalDenda: Int? = null,
-    @SerializedName("interval_denda") var intervalDenda: Int? = null
+    @SerializedName("interval_denda") var intervalDenda: Int? = null,
+    @SerializedName("denda_berlaku") var dendaBerlaku: Int? = null
 ) : Parcelable

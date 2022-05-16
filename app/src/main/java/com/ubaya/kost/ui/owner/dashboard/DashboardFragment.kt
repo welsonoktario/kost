@@ -9,6 +9,7 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -178,7 +179,10 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
         val prefs = PrefManager.getInstance(requireContext())
         prefs.clear()
 
-        findNavController().popBackStack(R.id.fragment_dashboard, true)
-        findNavController().navigate(R.id.fragment_login)
+        val navOptions = NavOptions
+            .Builder()
+            .setPopUpTo(R.id.fragment_dashboard, true)
+            .build()
+        findNavController().navigate(R.id.fragment_login, null, navOptions)
     }
 }
