@@ -114,11 +114,38 @@ class DetailTenantFragment : Fragment() {
 
         tenantViewModel.tenant.observe(viewLifecycleOwner) {
             tenant = it!!
+            val lamaMenyewa = tenant.lamaMenyewa()
+            val telat = tenant.telat(Global.authKost.dendaBerlaku!!)
 
             binding.detailTenantNama.text = tenant.user.name
             binding.detailTenantPhone.text = tenant.user.phone
             binding.detailTenantTglMasuk.text = tenant.entryDate
             binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
+
+            if (lamaMenyewa <= 1) {
+                binding.detailTenantDendaNull.visibility = View.VISIBLE
+                binding.detailTenantDendaDurasi.visibility = View.GONE
+                binding.detailTenantDendaNominal.visibility = View.GONE
+            } else if (lamaMenyewa > 1 && telat >= 1) {
+                binding.detailTenantDendaDurasi.text =
+                    "Telat membayar $telat hari"
+                binding.detailTenantDendaNominal.text =
+                    Global.authKost.nominalDenda?.let {
+                        NumberUtil().rupiah(
+                            tenant.nominalTelat(
+                                Global.authKost
+                            )
+                        )
+                    }
+
+                binding.detailTenantDendaNull.visibility = View.GONE
+                binding.detailTenantDendaDurasi.visibility = View.VISIBLE
+                binding.detailTenantDendaNominal.visibility = View.VISIBLE
+            } else if (lamaMenyewa > 1 && telat <= 1) {
+                binding.detailTenantDendaNull.visibility = View.VISIBLE
+                binding.detailTenantDendaDurasi.visibility = View.GONE
+                binding.detailTenantDendaNominal.visibility = View.GONE
+            }
 
             if (tenant.lamaMenyewa() <= 1) {
                 binding.btnKonfirm.isEnabled = false
@@ -235,7 +262,9 @@ class DetailTenantFragment : Fragment() {
         val roomType = tenantViewModel.roomType.value!!
         val services = tenantViewModel.services.value
         val adds = tenantViewModel.additionals.value
-        var total = roomType.cost!!
+        var total = tenantViewModel.total.value!!
+        val lamaMenyewa = tenant.lamaMenyewa()
+        val telat = tenant.telat(Global.authKost.dendaBerlaku!!)
 
         if (!this::dialogKonfirmasiBinding.isInitialized) {
             dialogKonfirmasiBinding =
@@ -246,6 +275,25 @@ class DetailTenantFragment : Fragment() {
         dialogKonfirmasiBinding.dialogKonfirmasiJenis.text = roomType.name
         dialogKonfirmasiBinding.dialogKonfirmasiJenisHarga.text =
             NumberUtil().rupiah(roomType.cost!!)
+
+        if (lamaMenyewa <= 1) {
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaNull.visibility = View.VISIBLE
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaDurasi.visibility = View.GONE
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaNominal.visibility = View.GONE
+        } else if (lamaMenyewa > 1 && telat >= 1) {
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaDurasi.text =
+                "Telat membayar $telat hari"
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaNominal.text =
+                Global.authKost.nominalDenda?.let { NumberUtil().rupiah(tenant.nominalTelat(Global.authKost)) }
+
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaNull.visibility = View.GONE
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaDurasi.visibility = View.VISIBLE
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaNominal.visibility = View.VISIBLE
+        } else {
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaNull.visibility = View.VISIBLE
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaDurasi.visibility = View.GONE
+            dialogKonfirmasiBinding.dialogKonfirmasiDendaNominal.visibility = View.GONE
+        }
 
         if (services.isNullOrEmpty()) {
             dialogKonfirmasiBinding.dialogKonfirmasiServiceNull.visibility = View.VISIBLE
@@ -261,7 +309,6 @@ class DetailTenantFragment : Fragment() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
                 row.orientation = LinearLayout.HORIZONTAL
-                total += it.cost!!
 
                 val name = TextView(requireContext())
                 name.text = it.name

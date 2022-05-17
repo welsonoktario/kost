@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,7 +29,7 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        serviceViewModel.loadServices()
+        serviceViewModel.loadPengajuanServices()
 
         _binding = FragmentServicesBinding.inflate(inflater, container, false)
 
@@ -49,6 +50,10 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
 
         binding.serviceRV.adapter = adapter
         binding.serviceRV.layoutManager = layoutManager
+
+        binding.serviceFabPengaturan.setOnClickListener {
+            findNavController().navigate(R.id.action_fragment_services_to_fragment_edit_service)
+        }
     }
 
     private fun initObserver() {
@@ -68,9 +73,11 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
         serviceViewModel.isLoading.observe(viewLifecycleOwner) {
             if (it) {
                 binding.serviceRV.visibility = View.GONE
+                binding.serviceFabPengaturan.visibility = View.GONE
                 binding.serviceLoading.visibility = View.VISIBLE
             } else {
                 binding.serviceRV.visibility = View.VISIBLE
+                binding.serviceFabPengaturan.visibility = View.VISIBLE
                 binding.serviceLoading.visibility = View.GONE
             }
         }
@@ -95,13 +102,13 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setMessage("Apakah anda yakin ingin menyetujui permintaan pemesanan service ini?")
                 .setPositiveButton("Terima") { _, _ ->
-                    serviceViewModel.updateService(
+                    serviceViewModel.updatePengajuanService(
                         position,
                         "diterima"
                     )
                 }
                 .setNegativeButton("Tolak") { _, _ ->
-                    serviceViewModel.updateService(
+                    serviceViewModel.updatePengajuanService(
                         position,
                         "ditolak"
                     )

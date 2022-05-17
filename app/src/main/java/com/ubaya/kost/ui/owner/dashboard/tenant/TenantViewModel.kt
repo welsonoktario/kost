@@ -95,6 +95,10 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
                     _services.value = tempServices
                     _total.value = data.getInt("total")
                     _additionals.value = Gson().fromJson(tenant.getString("additionals"))
+
+                    if (_tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
+                        _total.value = _total.value!! + _tenant.value!!.nominalTelat(Global.authKost)
+                    }
                 },
                 { err ->
                     try {

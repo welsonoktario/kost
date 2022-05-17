@@ -66,7 +66,6 @@ data class Tenant(
     }
 
     fun telat(dendaBerlaku: Int): Int {
-        Log.d("BERLAKU", dendaBerlaku.toString())
         val tz = TimeZone.currentSystemDefault()
         val due = LocalDate.parse(dueDate!!).plus(DatePeriod(0, 0, dendaBerlaku))
         val currentDateTime = Clock.System.now().toLocalDateTime(tz).toString().split("T")
@@ -75,11 +74,11 @@ data class Tenant(
         return due.daysUntil(currentDate)
     }
 
-    fun nominalTelat(kost: Kost): String {
+    fun nominalTelat(kost: Kost): Int {
         val telat = telat(kost.dendaBerlaku!!)
         Log.d("Telat", telat.toString())
         val nominal = ceil((telat / kost.intervalDenda!!).toDouble()).roundToInt() * kost.nominalDenda!!
 
-        return NumberUtil().rupiah(nominal)
+        return nominal
     }
 }

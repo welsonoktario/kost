@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ubaya.kost.data.models.Kost
 import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.databinding.CardDendaBinding
+import com.ubaya.kost.util.NumberUtil
 
 class DendaAdapter(private val data: ArrayList<Tenant>, private val kost: Kost) :
     RecyclerView.Adapter<DendaAdapter.DendaViewHolder>() {
@@ -18,7 +19,7 @@ class DendaAdapter(private val data: ArrayList<Tenant>, private val kost: Kost) 
             binding.cardDendaTelat.text =
                 "Telat membayar ${tenant.telat(kost.dendaBerlaku!!)} hari"
             binding.cardDendaNominal.text =
-                kost.nominalDenda?.let { tenant.nominalTelat(kost) }
+                kost.nominalDenda?.let { NumberUtil().rupiah(tenant.nominalTelat(kost)) }
             binding.cardDendaRoom.text = tenant.room!!.noKamar.toString()
             binding.cardDendaTanggal.text = tenant.dueDate
         }

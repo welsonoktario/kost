@@ -3,8 +3,9 @@ package com.ubaya.kost.ui.tenant.home
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -90,13 +91,13 @@ class TenantHomeFragment : Fragment() {
     @SuppressLint("UnsafeOptInUsageError")
     private fun initView() {
         notifCountBadge = BadgeDrawable.create(requireContext())
+
         binding.homeTenantNama.text = user.name
         binding.homeTenantPhone.text = user.phone
         binding.homeTenantTglMasuk.text = tenant.entryDate
         binding.homeTenantDue.text = tenant.dueDate
         binding.homeTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
 
-        Log.d("tenant.diffFromDue()", tenant.diffFromDue().toString())
         if (tenant.diffFromDue() > 7) {
             binding.tenantHomeCardTagihan.visibility = View.GONE
         } else {
@@ -155,7 +156,71 @@ class TenantHomeFragment : Fragment() {
             binding.homeTenantTipeKamar.text = it.name
         }
 
-        tenantViewModel.services.observe(viewLifecycleOwner) { }
+        tenantViewModel.additionals.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                binding.homeTenantAddsNull.visibility = View.VISIBLE
+                binding.homeTenantAdds.removeAllViews()
+            } else {
+                binding.homeTenantAddsNull.visibility = View.GONE
+                binding.homeTenantAdds.removeAllViews()
+
+                it.forEach { add ->
+                    val row = LinearLayout(requireContext())
+                    row.layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    row.orientation = LinearLayout.HORIZONTAL
+
+                    val name = TextView(requireContext())
+                    name.text = add.description
+
+                    val price = TextView(requireContext())
+                    price.text = NumberUtil().rupiah(add.cost)
+
+                    row.addView(
+                        name,
+                        LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                    )
+                    row.addView(price)
+
+                    binding.homeTenantAdds.addView(row)
+                }
+            }
+        }
+
+        tenantViewModel.services.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                binding.homeTenantServiceNull.visibility = View.VISIBLE
+                binding.homeTenantService.removeAllViews()
+            } else {
+                binding.homeTenantServiceNull.visibility = View.GONE
+                binding.homeTenantService.removeAllViews()
+
+                it.forEach { service ->
+                    val row = LinearLayout(requireContext())
+                    row.layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    row.orientation = LinearLayout.HORIZONTAL
+
+                    val name = TextView(requireContext())
+                    name.text = service.name
+
+                    val price = TextView(requireContext())
+                    price.text = NumberUtil().rupiah(service.cost!!)
+
+                    row.addView(
+                        name,
+                        LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                    )
+                    row.addView(price)
+
+                    binding.homeTenantService.addView(row)
+                }
+            }
+        }
 
         tenantViewModel.total.observe(viewLifecycleOwner) {
             binding.homeTenantTagihan.text = NumberUtil().rupiah(it)
@@ -166,6 +231,36 @@ class TenantHomeFragment : Fragment() {
                 Snackbar.make(binding.homeTenantLayoutMain, it, Snackbar.LENGTH_SHORT)
                     .setAction("OK") { }
                     .show()
+            }
+        }
+
+        tenantViewModel.kost.observeOnce(viewLifecycleOwner) { kost ->
+            val lamaMenyewa = tenant.lamaMenyewa()
+            val telat = tenant.telat(kost.dendaBerlaku!!)
+
+            if (lamaMenyewa <= 1) {
+                binding.homeTenantDendaNull.visibility = View.VISIBLE
+                binding.homeTenantDendaDurasi.visibility = View.GONE
+                binding.homeTenantDendaNominal.visibility = View.GONE
+            } else if (lamaMenyewa > 1 && telat >= 1) {
+                binding.homeTenantDendaDurasi.text =
+                    "Telat membayar $telat hari"
+                binding.homeTenantDendaNominal.text =
+                    kost.nominalDenda?.let {
+                        NumberUtil().rupiah(tenant.nominalTelat(kost))
+                    }
+
+                binding.homeTenantDendaNull.visibility = View.GONE
+                binding.homeTenantDendaDurasi.visibility = View.VISIBLE
+                binding.homeTenantDendaNominal.visibility = View.VISIBLE
+            } else if (lamaMenyewa > 1 && telat <= 1) {
+                binding.homeTenantDendaNull.visibility = View.VISIBLE
+                binding.homeTenantDendaDurasi.visibility = View.GONE
+                binding.homeTenantDendaNominal.visibility = View.GONE
+            }
+
+            if (telat > 1) {
+                tenantViewModel.setTotal(tenantViewModel.total.value!! + tenant.nominalTelat(kost))
             }
         }
     }

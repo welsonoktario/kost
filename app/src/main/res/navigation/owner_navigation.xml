@@ -125,7 +125,12 @@
         android:id="@+id/fragment_services"
         android:name="com.ubaya.kost.ui.owner.services.ServicesFragment"
         android:label="Pengajuan Service"
-        tools:layout="@layout/fragment_services" />
+        tools:layout="@layout/fragment_services" >
+        <action
+            android:id="@+id/action_fragment_services_to_fragment_edit_service"
+            app:destination="@id/fragment_edit_service"
+            app:popUpTo="@id/fragment_services" />
+    </fragment>
 
     <fragment
         android:id="@+id/fragment_denda"
@@ -152,4 +157,9 @@
         android:name="com.ubaya.kost.ui.owner.dashboard.tenant.EditTenantFragment"
         android:label="Ubah Biodata"
         tools:layout="@layout/fragment_edit_tenant" />
+    <fragment
+        android:id="@+id/fragment_edit_service"
+        android:name="com.ubaya.kost.ui.owner.services.EditServiceFragment"
+        android:label="Pengaturan Service"
+        tools:layout="@layout/fragment_edit_service" />
 </navigation>
