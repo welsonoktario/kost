@@ -142,7 +142,8 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
             address = binding.registerInputAlamatKost.text.toString(),
             user = setUser(),
             nominalDenda = binding.registerInputNominal.text.toString().toInt(),
-            intervalDenda = binding.registerInputInterval.text.toString().toInt()
+            intervalDenda = binding.registerInputInterval.text.toString().toInt(),
+            dendaBerlaku = binding.registerInputDendaBerlaku.text.toString().toInt()
         )
         val gson = GsonBuilder().disableHtmlEscaping().create()
 

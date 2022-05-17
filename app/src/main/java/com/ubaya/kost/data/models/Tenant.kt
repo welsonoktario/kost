@@ -1,6 +1,7 @@
 package com.ubaya.kost.data.models
 
 import android.os.Parcelable
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.ubaya.kost.util.NumberUtil
 import kotlinx.datetime.*
@@ -65,13 +66,20 @@ data class Tenant(
     }
 
     fun telat(dendaBerlaku: Int): Int {
+        Log.d("BERLAKU", dendaBerlaku.toString())
         val tz = TimeZone.currentSystemDefault()
-        val due = LocalDate.parse(dueDate!!)
+        val due = LocalDate.parse(dueDate!!).plus(DatePeriod(0, 0, dendaBerlaku))
         val currentDateTime = Clock.System.now().toLocalDateTime(tz).toString().split("T")
         val currentDate = LocalDate.parse(currentDateTime[0])
 
-        return due.plus(DatePeriod(0, 0, dendaBerlaku)).daysUntil(currentDate)
+        return due.daysUntil(currentDate)
     }
 
-    fun nominalTelat(kost: Kost) = NumberUtil().rupiah(ceil((telat(kost.dendaBerlaku!!) / kost.intervalDenda!!).toDouble()) * kost.nominalDenda!!)
+    fun nominalTelat(kost: Kost): String {
+        val telat = telat(kost.dendaBerlaku!!)
+        Log.d("Telat", telat.toString())
+        val nominal = ceil((telat / kost.intervalDenda!!).toDouble()).roundToInt() * kost.nominalDenda!!
+
+        return NumberUtil().rupiah(nominal)
+    }
 }
