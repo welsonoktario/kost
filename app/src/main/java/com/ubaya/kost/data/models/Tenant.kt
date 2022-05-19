@@ -1,7 +1,6 @@
 package com.ubaya.kost.data.models
 
 import android.os.Parcelable
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
@@ -76,15 +75,13 @@ data class Tenant(
     fun nominalTelat(kost: Kost): Int {
         val telat = telat(kost.dendaBerlaku!!)
 
-        return ceil((telat / kost.intervalDenda!!).toDouble()).roundToInt() * kost.nominalDenda!!
+        return ceil((telat.toDouble() / kost.intervalDenda!!.toDouble())).roundToInt() * kost.nominalDenda!!
     }
 
     fun sisaSewa(): Int {
-        val tz = TimeZone.currentSystemDefault()
         val leave = LocalDate.parse(leaveDate!!)
-        val currentDateTime = Clock.System.now().toLocalDateTime(tz).toString().split("T")
-        val currentDate = LocalDate.parse(currentDateTime[0])
+        val due = LocalDate.parse(dueDate!!)
 
-        return currentDate.monthsUntil(leave)
+        return due.monthsUntil(leave)
     }
 }

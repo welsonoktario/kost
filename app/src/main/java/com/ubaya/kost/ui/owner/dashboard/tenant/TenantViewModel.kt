@@ -69,10 +69,15 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun refreshTotal() {
-        val denda = _tenant.value!!.nominalTelat(Global.authKost)
         val adds = _additionals.value!!.sumOf { it.cost }
         val serv = _services.value!!.sumOf { it.cost!! }
-        _total.value = _roomType.value!!.cost!! + adds + serv + denda
+
+        _total.value = if (_tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
+            val denda = _tenant.value!!.nominalTelat(Global.authKost)
+            _roomType.value!!.cost!! + adds + serv + denda
+        } else {
+            _roomType.value!!.cost!! + adds + serv
+        }
     }
 
     fun loadDetailTenant(id: Int) {
@@ -103,9 +108,7 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
                     _total.value = data.getInt("total")
                     _additionals.value = Gson().fromJson(tenant.getString("additionals"))
 
-                    if (_tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
-                        _total.value = _total.value!! + _tenant.value!!.nominalTelat(Global.authKost)
-                    }
+                    refreshTotal()
                 },
                 { err ->
                     try {

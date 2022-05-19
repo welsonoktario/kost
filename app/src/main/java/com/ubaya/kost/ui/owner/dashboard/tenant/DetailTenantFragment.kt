@@ -116,55 +116,39 @@ class DetailTenantFragment : Fragment() {
             tenant = it!!
             val lamaMenyewa = tenant.lamaMenyewa()
             val telat = tenant.telat(Global.authKost.dendaBerlaku!!)
-            Log.d("sisaSewa", tenant.sisaSewa().toString())
 
             binding.detailTenantNama.text = tenant.user.name
             binding.detailTenantPhone.text = tenant.user.phone
             binding.detailTenantTglMasuk.text = tenant.entryDate
             binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
 
-            if (lamaMenyewa <= 1) {
-                binding.detailTenantDendaNull.visibility = View.VISIBLE
-                binding.detailTenantDendaDurasi.visibility = View.GONE
-                binding.detailTenantDendaNominal.visibility = View.GONE
-            } else if (lamaMenyewa > 1 && telat >= 1) {
-                binding.detailTenantDendaDurasi.text =
-                    "Telat membayar $telat hari"
-                binding.detailTenantDendaNominal.text =
-                    Global.authKost.nominalDenda?.let {
-                        NumberUtil().rupiah(
-                            tenant.nominalTelat(
-                                Global.authKost
-                            )
-                        )
-                    }
-
-                binding.detailTenantDendaNull.visibility = View.GONE
-                binding.detailTenantDendaDurasi.visibility = View.VISIBLE
-                binding.detailTenantDendaNominal.visibility = View.VISIBLE
-            } else if (lamaMenyewa > 1 && telat <= 1) {
-                binding.detailTenantDendaNull.visibility = View.VISIBLE
-                binding.detailTenantDendaDurasi.visibility = View.GONE
-                binding.detailTenantDendaNominal.visibility = View.GONE
-            }
-
-            if (tenant.lamaMenyewa() <= 1) {
-                binding.btnKonfirm.isEnabled = false
-                binding.btnTambah.isEnabled = false
-                binding.detailTenantCardTagihan.visibility = View.GONE
-                binding.detailTenantDue.text = "-"
-            } else {
-                binding.detailTenantCardTagihan.visibility = View.VISIBLE
-                binding.detailTenantDue.text = tenant.dueDate
-            }
-
             if (tenant.diffFromDue() >= 15) {
                 binding.btnKonfirm.isEnabled = false
             }
 
             if (tenant.sisaSewa() <= 1) {
-                binding.detailTenantCardTagihan.visibility = View.GONE
                 binding.btnTambah.isEnabled = false
+                binding.btnKonfirm.isEnabled = false
+                binding.detailTenantCardTagihan.visibility = View.GONE
+                binding.detailTenantDue.text = "-"
+            } else {
+                binding.btnTambah.isEnabled = true
+                binding.btnKonfirm.isEnabled = true
+                binding.detailTenantCardTagihan.visibility = View.VISIBLE
+                binding.detailTenantDue.text = tenant.dueDate
+
+                if (lamaMenyewa > 1 && telat >= 1) {
+                    binding.detailTenantDendaDurasi.text =
+                        "Telat membayar $telat hari"
+                    binding.detailTenantDendaNominal.text =
+                        Global.authKost.nominalDenda?.let {
+                            NumberUtil().rupiah(
+                                tenant.nominalTelat(
+                                    Global.authKost
+                                )
+                            )
+                        }
+                }
             }
         }
 

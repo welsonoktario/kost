@@ -184,5 +184,6 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
             .setPopUpTo(R.id.fragment_dashboard, true)
             .build()
         findNavController().navigate(R.id.fragment_login, null, navOptions)
+        requireActivity().recreate()
     }
 }

@@ -1,26 +1,29 @@
 package com.ubaya.kost.ui.tenant.home
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import coil.load
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.ubaya.kost.MainActivity
 import com.ubaya.kost.R
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.databinding.DialogFotoBinding
+import com.ubaya.kost.databinding.DialogTenantPasswordBinding
 import com.ubaya.kost.databinding.FragmentTenantHomeBinding
 import com.ubaya.kost.ui.shared.notifications.NotificationsViewModel
 import com.ubaya.kost.util.NumberUtil
@@ -31,10 +34,15 @@ import com.ubaya.kost.util.observeOnce
 class TenantHomeFragment : Fragment() {
 
     private var _binding: FragmentTenantHomeBinding? = null
-    private val binding get() = _binding!!
+    private var _dialogFotoBinding: DialogFotoBinding? = null
+    private var _dialogPassBinding: DialogTenantPasswordBinding? = null
 
-    private lateinit var dialogFotoBinding: DialogFotoBinding
+    private val binding get() = _binding!!
+    private val dialogFotoBinding get() = _dialogFotoBinding!!
+    private val dialogPassBinding get() = _dialogPassBinding!!
+
     private lateinit var dialogFoto: AlertDialog
+    private lateinit var dialogPass: AlertDialog
     private lateinit var notifCountBadge: BadgeDrawable
 
     private val tenantViewModel by navGraphViewModels<TenantHomeViewModel>(R.id.mobile_navigation)
@@ -49,6 +57,9 @@ class TenantHomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTenantHomeBinding.inflate(inflater, container, false)
+        _dialogFotoBinding = DialogFotoBinding.inflate(inflater, container, false)
+        _dialogPassBinding = DialogTenantPasswordBinding.inflate(inflater, container, false)
+
         return _binding!!.root
     }
 
@@ -67,6 +78,7 @@ class TenantHomeFragment : Fragment() {
                         R.id.action_fragment_tenant_home_to_fragment_tenant_notification
                     )
                     R.id.menu_tenant_message -> openChat()
+                    R.id.menu_tenant_pass -> openPassword()
                     R.id.menu_tenant_logout -> logout()
                 }
 
@@ -90,6 +102,17 @@ class TenantHomeFragment : Fragment() {
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun initView() {
+        dialogFoto = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogFotoBinding.root)
+            .create()
+
+        dialogPass = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogPassBinding.root)
+            .setTitle("Ubah Password")
+            .setPositiveButton("Ubah", null)
+            .setNegativeButton("Batal", null)
+            .create()
+
         notifCountBadge = BadgeDrawable.create(requireContext())
 
         binding.homeTenantNama.text = user.name
@@ -266,27 +289,21 @@ class TenantHomeFragment : Fragment() {
     }
 
     private fun fotoIdentitas() {
-        if (!this::dialogFotoBinding.isInitialized) {
-            dialogFotoBinding = DialogFotoBinding.inflate(layoutInflater, binding.root, false)
+        dialogFotoBinding.fotoKtp.load("${VolleyClient.BASE_URL}/storage/${tenant.ktp}").also {
+            dialogFoto.show()
         }
-
-        if (!this::dialogFoto.isInitialized) {
-            dialogFotoBinding.fotoKtp.load("${VolleyClient.BASE_URL}/storage/${tenant.id}")
-            dialogFoto = AlertDialog.Builder(requireContext())
-                .setView(dialogFotoBinding.root)
-                .create()
-        }
-
-        dialogFotoBinding.fotoKtp.load("${VolleyClient.BASE_URL}/storage/${tenant.ktp}")
-        dialogFoto.show()
     }
 
     private fun logout() {
         val prefs = PrefManager.getInstance(requireContext())
         prefs.clear()
 
-        findNavController().popBackStack(R.id.fragment_tenant_home, true)
-        findNavController().navigate(R.id.fragment_login)
+        val navOptions = NavOptions
+            .Builder()
+            .setPopUpTo(R.id.fragment_tenant_home, true)
+            .build()
+        findNavController().navigate(R.id.fragment_login, null, navOptions)
+        requireActivity().recreate()
     }
 
     private fun openChat() {
@@ -298,5 +315,27 @@ class TenantHomeFragment : Fragment() {
                 tenant.id
             )
         findNavController().navigate(action)
+    }
+
+    private fun openPassword() {
+        dialogPassBinding.dialogTenantPass.text!!.clear()
+        dialogPassBinding.dialogTenantPassConfirm.text!!.clear()
+        dialogPassBinding.dialogTenantPassConfirmLayout.isErrorEnabled = false
+
+        dialogPass.show()
+
+        dialogPass.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            dialogPassBinding.dialogTenantPassConfirmLayout.isErrorEnabled = false
+            val pass = dialogPassBinding.dialogTenantPass.text.toString()
+            val confirmPass = dialogPassBinding.dialogTenantPassConfirm.text.toString()
+
+            if (pass != confirmPass) {
+                dialogPassBinding.dialogTenantPassConfirmLayout.isErrorEnabled = true
+                dialogPassBinding.dialogTenantPassConfirmLayout.error = "Password tidak cocok"
+            } else {
+                tenantViewModel.gantiPassword(tenant.id, pass)
+                dialogPass.dismiss()
+            }
+        }
     }
 }

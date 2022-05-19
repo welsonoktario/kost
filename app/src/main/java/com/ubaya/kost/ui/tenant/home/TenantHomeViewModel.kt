@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.*
@@ -16,9 +17,8 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) {
-    val gson = GsonBuilder().create()
+    val gson: Gson = GsonBuilder().create()
     val isLoading = MutableLiveData<Boolean>()
-    val error = MutableLiveData(Error())
     val msg = MutableLiveData<String>()
 
     private val _roomType = MutableLiveData<RoomType>()
@@ -30,10 +30,10 @@ class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) 
     private val _kost = MutableLiveData<Kost>()
     val kost: LiveData<Kost> = _kost
 
-    private val _services = MutableLiveData<ArrayList<Service>>()
+    private val _services = MutableLiveData<ArrayList<Service>>(arrayListOf())
     val services: LiveData<ArrayList<Service>> = _services
 
-    private val _additionals = MutableLiveData<ArrayList<Additional>>()
+    private val _additionals = MutableLiveData<ArrayList<Additional>>(arrayListOf())
     val additionals: LiveData<ArrayList<Additional>> = _additionals
 
     private val _total = MutableLiveData<Int>()
@@ -44,27 +44,33 @@ class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) 
     }
 
     fun loadDetailTenant(id: Int) {
-        val newError = Error(false, "")
         isLoading.value = true
-        error.value = newError
 
         viewModelScope.launch {
             val url = VolleyClient.API_URL + "/tenants/$id"
             val request = object : JsonObjectRequest(url,
                 { res ->
                     isLoading.value = false
-                    error.value = newError
 
                     val data = res.getJSONObject("data")
                     val tenant = data.getJSONObject("tenant")
                     val room = tenant.getJSONObject("room")
+                    val servicesArr = tenant.getJSONArray("services")
+
+                    for (i in 0 until servicesArr.length()) {
+                        val svcJson = servicesArr.getJSONObject(i)
+                        val svc = svcJson.getString("service")
+                        Log.d("svc", svc)
+                        _services.value!!.add(gson.fromJson(svc))
+                    }
 
                     _room.value = gson.fromJson(room.toString())
                     _roomType.value = gson.fromJson(room.getString("room_type"))
-                    _services.value = gson.fromJson(tenant.getString("services"))
                     _additionals.value = gson.fromJson(tenant.getString("additionals"))
                     _total.value = data.getInt("total")
                     _kost.value = gson.fromJson(room.getString("kost"))
+
+                    Global.authKost = _kost.value!!
                 },
                 { err ->
                     Log.d("err", err.toString())
@@ -72,16 +78,45 @@ class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) 
                         val data = JSONObject(String(err.networkResponse.data))
 
                         isLoading.value = false
-                        newError.isError = true
-                        newError.msg = data.getString("msg")
-
-                        error.value = newError
+                        msg.value = data.getString("msg")
                     } catch (e: Exception) {
-                        isLoading.value = false
-                        newError.isError = true
-                        newError.msg = "Terjadi kesalahan sistem"
+                        msg.value = "Terjadi kesalahan sistem"
+                    }
+                }
+            ) {
+                override fun getHeaders() = hashMapOf(
+                    "Authorization" to "Bearer ${Global.authToken}"
+                )
+            }
 
-                        error.value = newError
+            VolleyClient.getInstance(app.applicationContext).addToRequestQueue(request)
+        }
+    }
+
+    fun gantiPassword(id: Int, pass: String) {
+        isLoading.value = true
+        val params = JSONObject()
+        params.put("pass", pass)
+
+        viewModelScope.launch {
+            val url = VolleyClient.API_URL + "/tenants/$id/password"
+            val request = object : JsonObjectRequest(
+                Method.PUT,
+                url,
+                params,
+                { res ->
+                    isLoading.value = false
+                    msg.value = res.getString("msg")
+                },
+                { err ->
+                    Log.d("err", err.toString())
+                    try {
+                        val data = JSONObject(String(err.networkResponse.data))
+
+                        isLoading.value = false
+                        msg.value = data.getString("msg")
+                    } catch (e: Exception) {
+                        msg.value = "Terjadi kesalahan sistem"
                     }
                 }
             ) {
