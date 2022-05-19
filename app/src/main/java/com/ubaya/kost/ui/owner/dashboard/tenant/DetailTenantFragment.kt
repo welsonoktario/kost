@@ -116,6 +116,7 @@ class DetailTenantFragment : Fragment() {
             tenant = it!!
             val lamaMenyewa = tenant.lamaMenyewa()
             val telat = tenant.telat(Global.authKost.dendaBerlaku!!)
+            Log.d("sisaSewa", tenant.sisaSewa().toString())
 
             binding.detailTenantNama.text = tenant.user.name
             binding.detailTenantPhone.text = tenant.user.phone
@@ -159,6 +160,11 @@ class DetailTenantFragment : Fragment() {
 
             if (tenant.diffFromDue() >= 15) {
                 binding.btnKonfirm.isEnabled = false
+            }
+
+            if (tenant.sisaSewa() <= 1) {
+                binding.detailTenantCardTagihan.visibility = View.GONE
+                binding.btnTambah.isEnabled = false
             }
         }
 
@@ -204,6 +210,8 @@ class DetailTenantFragment : Fragment() {
 
                     binding.detailTenantAdds.addView(row)
                 }
+
+                tenantViewModel.refreshTotal()
             }
         }
 
@@ -237,6 +245,8 @@ class DetailTenantFragment : Fragment() {
 
                     binding.detailTenantService.addView(row)
                 }
+
+                tenantViewModel.refreshTotal()
             }
         }
     }
@@ -262,7 +272,6 @@ class DetailTenantFragment : Fragment() {
         val roomType = tenantViewModel.roomType.value!!
         val services = tenantViewModel.services.value
         val adds = tenantViewModel.additionals.value
-        var total = tenantViewModel.total.value!!
         val lamaMenyewa = tenant.lamaMenyewa()
         val telat = tenant.telat(Global.authKost.dendaBerlaku!!)
 
@@ -339,7 +348,6 @@ class DetailTenantFragment : Fragment() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
                 row.orientation = LinearLayout.HORIZONTAL
-                total += it.cost
 
                 val name = TextView(requireContext())
                 name.text = it.description
@@ -357,7 +365,8 @@ class DetailTenantFragment : Fragment() {
             }
         }
 
-        dialogKonfirmasiBinding.dialogKonfirmasiTotal.text = NumberUtil().rupiah(total)
+        dialogKonfirmasiBinding.dialogKonfirmasiTotal.text =
+            NumberUtil().rupiah(tenantViewModel.total.value!!)
 
         if (!this::dialogKonfirmasi.isInitialized) {
             dialogKonfirmasi = AlertDialog.Builder(requireContext())
@@ -474,6 +483,11 @@ class DetailTenantFragment : Fragment() {
                 tenantViewModel.setTenant(tenant)
                 tenantViewModel.setServices(arrayListOf())
                 tenantViewModel.setAdditionals(arrayListOf())
+                binding.detailTenantAdds.removeAllViews()
+                binding.detailTenantAddsNull.visibility = View.VISIBLE
+                binding.detailTenantService.removeAllViews()
+                binding.detailTenantServiceNull.visibility = View.VISIBLE
+
                 dialogKonfirmasi.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")
             },

@@ -37,7 +37,7 @@ class NotificationsViewModel(private val app: Application) : AndroidViewModel(ap
                     _notifications.value = Gson().fromJson(res.getString("data"))
                 },
                 { err ->
-                    Log.d("ERR", String(err.networkResponse.data))
+                    Log.e("ERR", err.message.toString())
                     isLoading.value = false
 
                     try {

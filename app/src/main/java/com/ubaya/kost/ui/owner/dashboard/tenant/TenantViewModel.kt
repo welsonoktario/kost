@@ -68,6 +68,13 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun refreshTotal() {
+        val denda = _tenant.value!!.nominalTelat(Global.authKost)
+        val adds = _additionals.value!!.sumOf { it.cost }
+        val serv = _services.value!!.sumOf { it.cost!! }
+        _total.value = _roomType.value!!.cost!! + adds + serv + denda
+    }
+
     fun loadDetailTenant(id: Int) {
         val newError = Error(false, "")
         isLoading.value = true

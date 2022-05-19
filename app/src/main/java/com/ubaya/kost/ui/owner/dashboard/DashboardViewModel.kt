@@ -68,7 +68,7 @@ class DashboardViewModel(private val app: Application) : AndroidViewModel(app) {
                     selectedRoomType.value = roomTypes[0]
                 },
                 { err ->
-                    Log.d("ERR", String(err.networkResponse.data))
+                    Log.e("ERR", err.message.toString())
                     val data = JSONObject(String(err.networkResponse.data))
 
                     isLoading.value = false
