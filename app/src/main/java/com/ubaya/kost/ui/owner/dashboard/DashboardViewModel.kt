@@ -57,6 +57,7 @@ class DashboardViewModel(private val app: Application) : AndroidViewModel(app) {
                 { res ->
                     isLoading.value = false
                     error.value = newError
+                    Log.d("RES", res.toString())
 
                     val data = res.getJSONObject("data")
                     val kost = Gson().fromJson(data.toString(), Kost::class.java)

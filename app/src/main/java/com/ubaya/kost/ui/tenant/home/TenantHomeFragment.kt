@@ -298,6 +298,7 @@ class TenantHomeFragment : Fragment() {
         val prefs = PrefManager.getInstance(requireContext())
         prefs.clear()
 
+        activity?.viewModelStore!!.clear()
         val navOptions = NavOptions
             .Builder()
             .setPopUpTo(R.id.fragment_tenant_home, true)

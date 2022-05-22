@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.pembukuan
+package com.ubaya.kost.ui.owner.pembukuan.invoices
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,7 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ubaya.kost.data.models.Invoice
 import com.ubaya.kost.databinding.DialogDetailInvoiceBinding
 import com.ubaya.kost.databinding.FragmentInvoiceBinding
-import com.ubaya.kost.ui.shared.invoices.InvoiceAdapter
+import com.ubaya.kost.ui.owner.pembukuan.PembukuanViewModel
 import com.ubaya.kost.util.NumberUtil
 
 class InvoiceFragment : Fragment(), InvoiceAdapter.InvoiceListener {

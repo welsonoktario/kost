@@ -10,7 +10,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.Gson
 import com.ubaya.kost.data.Global
 import com.ubaya.kost.data.models.Error
-import com.ubaya.kost.data.models.Invoice
+import com.ubaya.kost.data.models.Transaksi
 import com.ubaya.kost.util.VolleyClient
 import com.ubaya.kost.util.fromJson
 import kotlinx.coroutines.launch
@@ -20,8 +20,8 @@ class TransaksiViewModel(private val app: Application) : AndroidViewModel(app) {
     val isLoading = MutableLiveData<Boolean>()
     val error = MutableLiveData(Error())
 
-    private val _invoices = MutableLiveData<ArrayList<Invoice>>(arrayListOf())
-    val invoices: LiveData<ArrayList<Invoice>> = _invoices
+    private val _transaksis = MutableLiveData<ArrayList<Transaksi>>(arrayListOf())
+    val transaksis: LiveData<ArrayList<Transaksi>> = _transaksis
 
     fun loadTransaksi() {
         isLoading.value = true
@@ -34,7 +34,7 @@ class TransaksiViewModel(private val app: Application) : AndroidViewModel(app) {
                 url,
                 { res ->
                     isLoading.value = false
-                    _invoices.value = Gson().fromJson(res.getString("data"))
+                    _transaksis.value = Gson().fromJson(res.getString("data"))
                 },
                 { err ->
                     Log.d("ERR", String(err.networkResponse.data))

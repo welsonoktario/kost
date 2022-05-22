@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.shared.invoices
+package com.ubaya.kost.ui.owner.pembukuan.invoices
 
 import android.view.LayoutInflater
 import android.view.View

@@ -183,6 +183,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
             .Builder()
             .setPopUpTo(R.id.fragment_dashboard, true)
             .build()
+        activity?.viewModelStore!!.clear()
         findNavController().navigate(R.id.fragment_login, null, navOptions)
         requireActivity().recreate()
     }
