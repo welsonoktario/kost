@@ -212,17 +212,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/homeTenantServiceNull"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="4dp"
-                            android:text="-"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:visibility="gone" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/homeTenantServiceNull"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:text="-"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
 
                     <TextView
                         style="@style/TextAppearance.MaterialComponents.Body2"
@@ -236,17 +236,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/homeTenantAddsNull"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="4dp"
-                            android:text="-"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:visibility="gone" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/homeTenantAddsNull"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:text="-"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
 
                     <TextView
                         style="@style/TextAppearance.MaterialComponents.Body2"
@@ -262,16 +262,6 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/homeTenantDendaNull"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="4dp"
-                            android:text="-"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:visibility="gone" />
-
-                        <TextView
                             android:id="@+id/homeTenantDendaDurasi"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -284,6 +274,16 @@
                             android:layout_height="wrap_content"
                             android:text="Rp 6.000" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/homeTenantDendaNull"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:text="-"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

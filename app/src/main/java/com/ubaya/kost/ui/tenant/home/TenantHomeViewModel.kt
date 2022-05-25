@@ -60,8 +60,9 @@ class TenantHomeViewModel(private val app: Application) : AndroidViewModel(app) 
                     for (i in 0 until servicesArr.length()) {
                         val svcJson = servicesArr.getJSONObject(i)
                         val svc = svcJson.getString("service")
-                        Log.d("svc", svc)
-                        _services.value!!.add(gson.fromJson(svc))
+                        _services.value = _services.value!!.apply {
+                            this.add(gson.fromJson(svc))
+                        }
                     }
 
                     _room.value = gson.fromJson(room.toString())

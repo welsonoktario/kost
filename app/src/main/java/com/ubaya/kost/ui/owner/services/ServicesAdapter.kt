@@ -28,8 +28,8 @@ class ServicesAdapter(
         fun bind(tenantService: TenantService) {
             binding.listTenantServiceNama.text = tenantService.tenant.user.name
             binding.listTenantServiceService.text = tenantService.service.name
-            binding.listTenantServiceNo.text = tenantService.tenant.room!!.noKamar.toString()
-            binding.listTenantServiceDate.text = tenantService.date
+            binding.listTenantServiceNo.text = tenantService.tenant.room!!.noKamar
+            binding.listTenantServiceDate.text = "Pengajuan service untuk ${tenantService.date}"
 
             when(tenantService.status) {
                 "diterima" -> {

@@ -72,12 +72,14 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
         val adds = _additionals.value!!.sumOf { it.cost }
         val serv = _services.value!!.sumOf { it.cost!! }
 
-        _total.value = if (_tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
+        val newTotal = if (_tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
             val denda = _tenant.value!!.nominalTelat(Global.authKost)
             _roomType.value!!.cost!! + adds + serv + denda
         } else {
             _roomType.value!!.cost!! + adds + serv
         }
+
+        _total.value = newTotal
     }
 
     fun loadDetailTenant(id: Int) {

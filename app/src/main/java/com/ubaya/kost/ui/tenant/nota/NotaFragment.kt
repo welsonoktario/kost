@@ -1,4 +1,4 @@
-package com.ubaya.kost.ui.owner.pembukuan.invoices
+package com.ubaya.kost.ui.tenant.nota
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,48 +8,39 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ubaya.kost.R
+import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.Invoice
 import com.ubaya.kost.databinding.DialogDetailInvoiceBinding
-import com.ubaya.kost.databinding.FragmentInvoiceBinding
-import com.ubaya.kost.ui.owner.pembukuan.PembukuanViewModel
+import com.ubaya.kost.databinding.FragmentNotaBinding
 import com.ubaya.kost.util.NumberUtil
 
-class InvoiceFragment : Fragment(), InvoiceAdapter.InvoiceListener {
+class NotaFragment : Fragment(), NotaAdapter.NotaListener {
 
     private lateinit var invoices: ArrayList<Invoice>
-    private lateinit var adapter: InvoiceAdapter
+    private lateinit var adapter: NotaAdapter
     private lateinit var dialog: AlertDialog
 
-    private var _binding: FragmentInvoiceBinding? = null
+    private var _binding: FragmentNotaBinding? = null
     private var _dialogBinding: DialogDetailInvoiceBinding? = null
 
     private val binding get() = _binding!!
     private val dialogBinding get() = _dialogBinding!!
-    private val pembukuanViewModel: PembukuanViewModel by viewModels(
-        ownerProducer = {
-            requireParentFragment()
-        }
-    )
+    private val notaViewModel by navGraphViewModels<NotaViewModel>(R.id.mobile_navigation)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentInvoiceBinding.inflate(layoutInflater, container, false)
+        notaViewModel.loadNota()
+        _binding = FragmentNotaBinding.inflate(inflater, container, false)
         _dialogBinding = DialogDetailInvoiceBinding.inflate(layoutInflater, container, false)
 
         return _binding!!.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        initObserver()
-        initView()
     }
 
     override fun onDestroy() {
@@ -59,17 +50,24 @@ class InvoiceFragment : Fragment(), InvoiceAdapter.InvoiceListener {
         _dialogBinding = null
     }
 
-    override fun onCardInvoiceClick(position: Int) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initView()
+        initObserver()
+    }
+
+    override fun onCardNotaClick(position: Int) {
         openDialog(position)
     }
 
     private fun initView() {
         val layoutManager = LinearLayoutManager(requireContext())
         invoices = arrayListOf()
-        adapter = InvoiceAdapter(invoices, this)
+        adapter = NotaAdapter(invoices, this)
 
-        binding.invoiceRV.adapter = adapter
-        binding.invoiceRV.layoutManager = layoutManager
+        binding.notaRV.adapter = adapter
+        binding.notaRV.layoutManager = layoutManager
 
         dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("Detail Tagihan")
@@ -79,24 +77,45 @@ class InvoiceFragment : Fragment(), InvoiceAdapter.InvoiceListener {
     }
 
     private fun initObserver() {
-        pembukuanViewModel.invoices.observe(viewLifecycleOwner) {
+        notaViewModel.invoices.observe(viewLifecycleOwner) {
             invoices.clear()
             invoices.addAll(it)
 
             adapter.notifyDataSetChanged()
 
-            binding.invoiceEmpty.visibility =
-                if (!pembukuanViewModel.isLoading.value!! && invoices.isEmpty()) {
+            binding.notaEmpty.visibility =
+                if (!notaViewModel.isLoading.value!! && invoices.isEmpty()) {
                     View.VISIBLE
                 } else {
                     View.GONE
                 }
         }
+
+        notaViewModel.isLoading.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.notaLoading.visibility = View.VISIBLE
+                binding.notaRV.visibility = View.GONE
+                binding.notaEmpty.visibility = View.GONE
+            } else {
+                binding.notaLoading.visibility = View.GONE
+                binding.notaRV.visibility = View.VISIBLE
+                binding.notaEmpty.visibility = View.VISIBLE
+            }
+        }
+
+        notaViewModel.error.observe(viewLifecycleOwner) {
+            if (it.isError) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(notaViewModel.error.value!!.msg)
+                    .show()
+                notaViewModel.error.value = Error()
+            }
+        }
     }
 
     private fun openDialog(position: Int) {
         var total = 0
-        val invoice = pembukuanViewModel.invoices.value?.get(position)!!
+        val invoice = notaViewModel.invoices.value?.get(position)!!
         val tenant = invoice.tenant
 
         dialogBinding.dialogInvoiceTanggal.text = tenant.tanggalTagihan()

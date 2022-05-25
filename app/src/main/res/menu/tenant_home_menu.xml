@@ -14,6 +14,10 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/menu_tenant_nota"
+        android:title="Nota" />
+
+    <item
         android:id="@+id/menu_tenant_pass"
         android:title="Ubah Password" />
 

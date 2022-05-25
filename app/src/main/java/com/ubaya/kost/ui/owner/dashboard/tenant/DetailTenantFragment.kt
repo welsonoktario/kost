@@ -67,6 +67,15 @@ class DetailTenantFragment : Fragment() {
         initView()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+
+        tenantViewModel.setTotal(0)
+        tenantViewModel.setAdditionals(arrayListOf())
+        tenantViewModel.setServices(arrayListOf())
+    }
+
     private fun initView() {
         binding.btnFoto.setOnClickListener {
             fotoIdentitas()
@@ -115,6 +124,8 @@ class DetailTenantFragment : Fragment() {
         tenantViewModel.tenant.observe(viewLifecycleOwner) {
             tenant = it!!
             val lamaMenyewa = tenant.lamaMenyewa()
+            val sisaSewa = tenant.sisaSewa()
+            val diffFromDue = tenant.diffFromDue()
             val telat = tenant.telat(Global.authKost.dendaBerlaku!!)
 
             binding.detailTenantNama.text = tenant.user.name
@@ -122,39 +133,53 @@ class DetailTenantFragment : Fragment() {
             binding.detailTenantTglMasuk.text = tenant.entryDate
             binding.detailTenantLama.text = "${tenant.lamaMenyewa()} Bulan"
 
-            if (tenant.diffFromDue() >= 15) {
-                binding.btnKonfirm.isEnabled = false
-            }
-
-            if (tenant.sisaSewa() <= 1) {
-                binding.btnTambah.isEnabled = false
-                binding.btnKonfirm.isEnabled = false
-                binding.detailTenantCardTagihan.visibility = View.GONE
-                binding.detailTenantDue.text = "-"
-            } else {
-                binding.btnTambah.isEnabled = true
-                binding.btnKonfirm.isEnabled = true
-                binding.detailTenantCardTagihan.visibility = View.VISIBLE
-                binding.detailTenantDue.text = tenant.dueDate
-
-                if (lamaMenyewa > 1 && telat >= 1) {
-                    binding.detailTenantDendaDurasi.text =
-                        "Telat membayar $telat hari"
-                    binding.detailTenantDendaNominal.text =
-                        Global.authKost.nominalDenda?.let {
-                            NumberUtil().rupiah(
-                                tenant.nominalTelat(
-                                    Global.authKost
-                                )
-                            )
-                        }
+            when {
+                sisaSewa < 1 -> {
+                    binding.detailTenantDue.text = "-"
+                    binding.btnKonfirm.isEnabled = false
+                    binding.btnTambah.isEnabled = false
                 }
+                sisaSewa >= 1 -> {
+                    binding.detailTenantDue.text = tenant.dueDate
+                    binding.btnKonfirm.isEnabled = diffFromDue <= 15
+                    binding.btnTambah.isEnabled = true
+                }
+                lamaMenyewa <= 1 -> {
+                    binding.detailTenantDue.text = "-"
+                    binding.btnKonfirm.isEnabled = false
+                    binding.btnTambah.isEnabled = false
+                }
+                lamaMenyewa > 1 -> {
+                    binding.detailTenantDue.text = tenant.dueDate
+                    binding.btnKonfirm.isEnabled = diffFromDue <= 15
+                    binding.btnTambah.isEnabled = true
+                }
+                diffFromDue <= 15 -> binding.btnKonfirm.isEnabled = true
+                diffFromDue > 15 -> binding.btnKonfirm.isEnabled = false
+            }
+
+            if (lamaMenyewa > 1 && telat >= 1) {
+                binding.detailTenantDendaNull.visibility = View.GONE
+                binding.detailTenantDendaDurasi.text =
+                    "Telat membayar $telat hari"
+                binding.detailTenantDendaNominal.text =
+                    Global.authKost.nominalDenda?.let {
+                        NumberUtil().rupiah(
+                            tenant.nominalTelat(
+                                Global.authKost
+                            )
+                        )
+                    }
+            } else if (lamaMenyewa > 1 && telat < 1) {
+                binding.detailTenantDendaDurasi.visibility = View.GONE
+                binding.detailTenantDendaNominal.visibility = View.GONE
+                binding.detailTenantDendaNull.visibility = View.VISIBLE
             }
         }
 
-        tenantViewModel.total.observe(viewLifecycleOwner) {
+        /*tenantViewModel.total.observe(viewLifecycleOwner) {
             binding.detailTenantTotal.text = NumberUtil().rupiah(it)
-        }
+        }*/
 
         tenantViewModel.msg.observe(viewLifecycleOwner) {
             if (!it.isNullOrEmpty()) {
@@ -195,7 +220,7 @@ class DetailTenantFragment : Fragment() {
                     binding.detailTenantAdds.addView(row)
                 }
 
-                tenantViewModel.refreshTotal()
+                refreshTotal()
             }
         }
 
@@ -230,7 +255,7 @@ class DetailTenantFragment : Fragment() {
                     binding.detailTenantService.addView(row)
                 }
 
-                tenantViewModel.refreshTotal()
+                refreshTotal()
             }
         }
     }
@@ -467,6 +492,7 @@ class DetailTenantFragment : Fragment() {
                 tenantViewModel.setTenant(tenant)
                 tenantViewModel.setServices(arrayListOf())
                 tenantViewModel.setAdditionals(arrayListOf())
+
                 binding.detailTenantAdds.removeAllViews()
                 binding.detailTenantAddsNull.visibility = View.VISIBLE
                 binding.detailTenantService.removeAllViews()
@@ -474,6 +500,7 @@ class DetailTenantFragment : Fragment() {
 
                 dialogKonfirmasi.dismiss()
                 tenantViewModel.msg.value = res.getString("msg")
+                refreshTotal()
             },
             { err ->
                 Log.d("ERR", err.networkResponse.toString())
@@ -594,5 +621,20 @@ class DetailTenantFragment : Fragment() {
                 tenant.id
             )
         findNavController().navigate(action)
+    }
+
+    private fun refreshTotal() {
+        val adds = tenantViewModel.additionals.value!!.sumOf { it.cost }
+        val serv = tenantViewModel.services.value!!.sumOf { it.cost!! }
+
+        val newTotal = if (tenantViewModel.tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
+            val denda = tenantViewModel.tenant.value!!.nominalTelat(Global.authKost)
+            tenantViewModel.roomType.value!!.cost!! + adds + serv + denda
+        } else {
+            tenantViewModel.roomType.value!!.cost!! + adds + serv
+        }
+
+        tenantViewModel.refreshTotal()
+        binding.detailTenantTotal.text = NumberUtil().rupiah(newTotal)
     }
 }

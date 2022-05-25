@@ -42,6 +42,10 @@
             app:popEnterAnim="@anim/grow_fade_in"
             app:popExitAnim="@anim/shrink_fade_out"
             app:popUpTo="@id/fragment_tenant_home" />
+        <action
+            android:id="@+id/action_fragment_tenant_home_to_fragment_nota"
+            app:destination="@id/fragment_nota"
+            app:popUpTo="@id/fragment_tenant_home" />
     </fragment>
     <fragment
         android:id="@+id/fragment_tenant_notification"
@@ -70,4 +74,9 @@
             android:name="tenant"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/fragment_nota"
+        android:name="com.ubaya.kost.ui.tenant.nota.NotaFragment"
+        android:label="Nota"
+        tools:layout="@layout/fragment_nota" />
 </navigation>

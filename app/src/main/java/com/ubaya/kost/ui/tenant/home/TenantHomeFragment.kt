@@ -78,6 +78,9 @@ class TenantHomeFragment : Fragment() {
                         R.id.action_fragment_tenant_home_to_fragment_tenant_notification
                     )
                     R.id.menu_tenant_message -> openChat()
+                    R.id.menu_tenant_nota -> findNavController().navigate(
+                        R.id.action_fragment_tenant_home_to_fragment_nota
+                    )
                     R.id.menu_tenant_pass -> openPassword()
                     R.id.menu_tenant_logout -> logout()
                 }
