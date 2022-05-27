@@ -48,7 +48,9 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun setServices(services: ArrayList<Service>) {
         _services.value!!.clear()
-        _services.value!!.addAll(services)
+        _services.value = _services.value!!.apply {
+            this.addAll(services)
+        }
     }
 
     fun addService(service: Service) {
@@ -59,7 +61,9 @@ class TenantViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun setAdditionals(additionals: ArrayList<Additional>) {
         _additionals.value!!.clear()
-        _additionals.value!!.addAll(additionals)
+        _additionals.value = _additionals.value!!.apply {
+            this.addAll(additionals)
+        }
     }
 
     fun addAdditional(additional: Additional) {

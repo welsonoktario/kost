@@ -2,6 +2,7 @@ package com.ubaya.kost.ui.tenant.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -262,6 +263,8 @@ class TenantHomeFragment : Fragment() {
 
         tenantViewModel.kost.observeOnce(viewLifecycleOwner) { kost ->
             val lamaMenyewa = tenant.lamaMenyewa()
+            val sisaSewa = tenant.sisaSewa()
+            val diffFromDue = tenant.diffFromDue()
             val telat = tenant.telat(kost.dendaBerlaku!!)
 
             if (lamaMenyewa <= 1) {
@@ -287,6 +290,14 @@ class TenantHomeFragment : Fragment() {
 
             if (telat > 1) {
                 tenantViewModel.setTotal(tenantViewModel.total.value!! + tenant.nominalTelat(kost))
+            }
+
+            if (sisaSewa >= 1) {
+                binding.homeTenantDue.text = tenant.dueDate
+                binding.btnHomeTenantService.isEnabled = true
+            } else {
+                binding.homeTenantDue.text = "-"
+                binding.btnHomeTenantService.isEnabled = false
             }
         }
     }

@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_tenant_komplain -> navView.visibility = View.GONE
                 R.id.fragment_tenant_chat_room -> navView.visibility = View.GONE
                 R.id.fragment_tenant_service -> navView.visibility = View.GONE
+                R.id.fragment_nota -> navView.visibility = View.GONE
                 else -> navView.visibility = View.VISIBLE
             }
         }

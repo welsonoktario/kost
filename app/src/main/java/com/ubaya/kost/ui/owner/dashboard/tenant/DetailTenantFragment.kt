@@ -138,6 +138,9 @@ class DetailTenantFragment : Fragment() {
                     binding.detailTenantDue.text = "-"
                     binding.btnKonfirm.isEnabled = false
                     binding.btnTambah.isEnabled = false
+                    binding.detailTenantDendaDurasi.visibility = View.GONE
+                    binding.detailTenantDendaNominal.visibility = View.GONE
+                    binding.detailTenantDendaNull.visibility = View.VISIBLE
                 }
                 sisaSewa >= 1 -> {
                     binding.detailTenantDue.text = tenant.dueDate
@@ -148,6 +151,9 @@ class DetailTenantFragment : Fragment() {
                     binding.detailTenantDue.text = "-"
                     binding.btnKonfirm.isEnabled = false
                     binding.btnTambah.isEnabled = false
+                    binding.detailTenantDendaDurasi.visibility = View.GONE
+                    binding.detailTenantDendaNominal.visibility = View.GONE
+                    binding.detailTenantDendaNull.visibility = View.VISIBLE
                 }
                 lamaMenyewa > 1 -> {
                     binding.detailTenantDue.text = tenant.dueDate
@@ -158,7 +164,7 @@ class DetailTenantFragment : Fragment() {
                 diffFromDue > 15 -> binding.btnKonfirm.isEnabled = false
             }
 
-            if (lamaMenyewa > 1 && telat >= 1) {
+            if (sisaSewa >= 1 && telat >= 1) {
                 binding.detailTenantDendaNull.visibility = View.GONE
                 binding.detailTenantDendaDurasi.text =
                     "Telat membayar $telat hari"
@@ -170,16 +176,16 @@ class DetailTenantFragment : Fragment() {
                             )
                         )
                     }
-            } else if (lamaMenyewa > 1 && telat < 1) {
+                binding.detailTenantDendaDurasi.visibility = View.VISIBLE
+                binding.detailTenantDendaNominal.visibility = View.VISIBLE
+            } else if (sisaSewa >= 1 && telat < 1) {
                 binding.detailTenantDendaDurasi.visibility = View.GONE
                 binding.detailTenantDendaNominal.visibility = View.GONE
                 binding.detailTenantDendaNull.visibility = View.VISIBLE
             }
-        }
 
-        /*tenantViewModel.total.observe(viewLifecycleOwner) {
-            binding.detailTenantTotal.text = NumberUtil().rupiah(it)
-        }*/
+            refreshTotal()
+        }
 
         tenantViewModel.msg.observe(viewLifecycleOwner) {
             if (!it.isNullOrEmpty()) {
@@ -626,12 +632,16 @@ class DetailTenantFragment : Fragment() {
     private fun refreshTotal() {
         val adds = tenantViewModel.additionals.value!!.sumOf { it.cost }
         val serv = tenantViewModel.services.value!!.sumOf { it.cost!! }
+        var newTotal = tenantViewModel.roomType.value!!.cost!!
 
-        val newTotal = if (tenantViewModel.tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
-            val denda = tenantViewModel.tenant.value!!.nominalTelat(Global.authKost)
-            tenantViewModel.roomType.value!!.cost!! + adds + serv + denda
-        } else {
-            tenantViewModel.roomType.value!!.cost!! + adds + serv
+        if (tenant.sisaSewa() >= 1) {
+            newTotal +=
+                if (tenantViewModel.tenant.value!!.telat(Global.authKost.dendaBerlaku!!) > 1) {
+                    val denda = tenantViewModel.tenant.value!!.nominalTelat(Global.authKost)
+                    adds + serv + denda
+                } else {
+                    adds + serv
+                }
         }
 
         tenantViewModel.refreshTotal()
