@@ -34,10 +34,10 @@ class TransaksiAdapter(
                     )
                 )
                 binding.cardTransaksiType.text = "Tagihan"
-                binding.cardTransaksiTenantDate.text = invoice.tenant.user.name
+                binding.cardTransaksiTenantDate.text = invoice.nama
                 binding.cardTransaksiDateDesc.text = invoice.date
                 binding.cardTransaksiTotal.text = NumberUtil().rupiah(invoice.total)
-                binding.cardTransaksiNo.text = invoice.tenant.room!!.noKamar.toString()
+                binding.cardTransaksiNo.text = invoice.noKamar
                 binding.cardTransaksiNo.visibility = View.VISIBLE
 
                 binding.cardTransaksi.setOnClickListener {

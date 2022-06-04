@@ -23,7 +23,7 @@ class NotaAdapter(private val data: ArrayList<Invoice>, private val listener: No
         }
 
         fun bind(invoice: Invoice) {
-            binding.cardInvoiceTenant.text = invoice.tenant.user.name
+            binding.cardInvoiceTenant.text = invoice.nama
             binding.cardInvoiceDate.text = invoice.date
             binding.cardInvoiceTotal.text = NumberUtil().rupiah(invoice.total)
             binding.cardInvoiceNo.visibility = View.GONE

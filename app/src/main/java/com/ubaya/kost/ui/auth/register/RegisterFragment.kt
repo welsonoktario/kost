@@ -21,6 +21,7 @@ import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.data.models.User
 import com.ubaya.kost.databinding.FragmentRegisterBinding
 import com.ubaya.kost.util.PrefManager
+import com.ubaya.kost.util.ThousandSeparator
 import com.ubaya.kost.util.VolleyClient
 import org.json.JSONArray
 import org.json.JSONObject
@@ -78,6 +79,10 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
             if (checkForm()) {
                 register()
             }
+        }
+
+        binding.registerInputNominal.apply {
+            addTextChangedListener(ThousandSeparator(this))
         }
     }
 
@@ -141,7 +146,7 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
             name = binding.registerInputNamaKost.text.toString(),
             address = binding.registerInputAlamatKost.text.toString(),
             user = setUser(),
-            nominalDenda = binding.registerInputNominal.text.toString().toInt(),
+            nominalDenda = binding.registerInputNominal.text.toString().replace(".", "").toInt(),
             intervalDenda = binding.registerInputInterval.text.toString().toInt(),
             dendaBerlaku = binding.registerInputDendaBerlaku.text.toString().toInt()
         )

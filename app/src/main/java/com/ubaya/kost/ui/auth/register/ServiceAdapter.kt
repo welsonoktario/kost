@@ -8,6 +8,7 @@ import androidx.core.text.isDigitsOnly
 import androidx.recyclerview.widget.RecyclerView
 import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.databinding.CardRegisterServiceBinding
+import com.ubaya.kost.util.NumberUtil
 
 class ServiceAdapter(
     private val data: ArrayList<Service>,
@@ -37,7 +38,8 @@ class ServiceAdapter(
                     start: Int,
                     count: Int,
                     after: Int
-                ) { }
+                ) {
+                }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
@@ -47,7 +49,8 @@ class ServiceAdapter(
                         val newValue = s.toString()
                         listener.onNamaServiceChanged(adapterPosition, newValue)
                     } else {
-                        binding.cardRegisterServiceLayoutNama.error = "Jenis kamar tidak boleh kosong"
+                        binding.cardRegisterServiceLayoutNama.error =
+                            "Jenis kamar tidak boleh kosong"
                     }
                 }
             })
@@ -58,7 +61,8 @@ class ServiceAdapter(
                     start: Int,
                     count: Int,
                     after: Int
-                ) { }
+                ) {
+                }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
@@ -68,7 +72,8 @@ class ServiceAdapter(
                         val newValue = s.toString()
                         listener.onDeskripsiServiceChanged(adapterPosition, newValue)
                     } else {
-                        binding.cardRegisterServiceLayoutDeskripsi.error = "Jenis kamar tidak boleh kosong"
+                        binding.cardRegisterServiceLayoutDeskripsi.error =
+                            "Jenis kamar tidak boleh kosong"
                     }
                 }
             })
@@ -79,14 +84,22 @@ class ServiceAdapter(
                     start: Int,
                     count: Int,
                     after: Int
-                ) { }
+                ) {
+                }
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    binding.cardRegisterServiceHarga.removeTextChangedListener(this)
+
+                    binding.cardRegisterServiceHarga.setText(NumberUtil().thousand(s.toString()))
+                    binding.cardRegisterServiceHarga.setSelection(binding.cardRegisterServiceHarga.text!!.length)
+
+                    binding.cardRegisterServiceHarga.addTextChangedListener(this)
+                }
 
                 override fun afterTextChanged(s: Editable?) {
                     if (s != null && s.toString() != "" && s.isDigitsOnly()) {
                         binding.cardRegisterServiceLayoutHarga.error = null
-                        val newValue = s.toString().toInt()
+                        val newValue = s.toString().replace(".", "").toInt()
                         listener.onHargaServiceChanged(adapterPosition, newValue)
                     } else {
                         binding.cardRegisterServiceLayoutHarga.error = "Harga harus berupa angka"

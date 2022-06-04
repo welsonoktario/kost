@@ -8,6 +8,8 @@ import androidx.core.text.isDigitsOnly
 import androidx.recyclerview.widget.RecyclerView
 import com.ubaya.kost.data.models.RoomType
 import com.ubaya.kost.databinding.CardRegisterJenisKamarBinding
+import com.ubaya.kost.util.NumberUtil
+import com.ubaya.kost.util.ThousandSeparator
 
 class RoomTypeAdapter(
     private val data: ArrayList<RoomType>,
@@ -51,7 +53,7 @@ class RoomTypeAdapter(
                     after: Int
                 ) { }
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
 
                 override fun afterTextChanged(s: Editable?) {
                     if (s != null && s.toString() != "") {
@@ -75,7 +77,7 @@ class RoomTypeAdapter(
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
                 override fun afterTextChanged(s: Editable?) {
-                    if (s != null && s.toString() != "" && s.isDigitsOnly()) {
+                    if (s != null && s.toString() != "") {
                         binding.cardRegisterJenisLayoutJumlah.error = null
                         val newValue = s.toString().toInt()
                         listener.onJumlahJenisChanged(adapterPosition, newValue)
@@ -93,12 +95,19 @@ class RoomTypeAdapter(
                     after: Int
                 ) { }
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    binding.cardRegisterJenisHarga.removeTextChangedListener(this)
+
+                    binding.cardRegisterJenisHarga.setText(NumberUtil().thousand(s.toString()))
+                    binding.cardRegisterJenisHarga.setSelection(binding.cardRegisterJenisHarga.text!!.length)
+
+                    binding.cardRegisterJenisHarga.addTextChangedListener(this)
+                }
 
                 override fun afterTextChanged(s: Editable?) {
-                    if (s != null && s.toString() != "" && s.isDigitsOnly()) {
+                    if (s != null && s.toString() != "") {
                         binding.cardRegisterJenisLayoutHarga.error = null
-                        val newValue = s.toString().toInt()
+                        val newValue = s.toString().replace(".", "").toInt()
                         listener.onHargaJenisChanged(adapterPosition, newValue)
                     } else {
                         binding.cardRegisterJenisLayoutHarga.error = "Harga harus berupa angka"

@@ -14,6 +14,8 @@ import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.Service
 import com.ubaya.kost.databinding.DialogDetailServiceBinding
 import com.ubaya.kost.databinding.FragmentEditServiceBinding
+import com.ubaya.kost.util.NumberUtil
+import com.ubaya.kost.util.ThousandSeparator
 
 class EditServiceFragment : Fragment(), EditServiceAdapter.EditServiceListener {
     private lateinit var adapter: EditServiceAdapter
@@ -48,7 +50,9 @@ class EditServiceFragment : Fragment(), EditServiceAdapter.EditServiceListener {
 
     override fun onDestroy() {
         super.onDestroy()
+
         _binding = null
+        _dialogBinding = null
     }
 
     private fun initView() {
@@ -67,6 +71,10 @@ class EditServiceFragment : Fragment(), EditServiceAdapter.EditServiceListener {
 
         binding.editServiceFabAdd.setOnClickListener {
             add()
+        }
+
+        dialogBinding.dialogServiceCost.apply {
+            addTextChangedListener(ThousandSeparator(this))
         }
     }
 
@@ -92,9 +100,10 @@ class EditServiceFragment : Fragment(), EditServiceAdapter.EditServiceListener {
 
         dialogBinding.dialogServiceName.setText(service.name)
         dialogBinding.dialogServiceDescription.setText(service.description)
-        dialogBinding.dialogServiceCost.setText(service.cost.toString())
+        dialogBinding.dialogServiceCost.setText(NumberUtil().thousand(service.cost.toString()))
 
-        dialogBinding.dialogServiceCost.isEnabled = servicesViewModel.tenantService.value!!.isEmpty()
+        dialogBinding.dialogServiceCost.isEnabled =
+            servicesViewModel.tenantService.value!!.isEmpty()
 
         dialog.setTitle("Edit Service")
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Simpan") { _, _ ->
@@ -105,6 +114,7 @@ class EditServiceFragment : Fragment(), EditServiceAdapter.EditServiceListener {
 
             servicesViewModel.updateService(id, name, description, cost)
         }
+
         dialog.show()
     }
 

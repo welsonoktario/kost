@@ -14,28 +14,31 @@ import com.ubaya.kost.data.models.Pengeluaran
 import com.ubaya.kost.databinding.DialogAddPengeluaranBinding
 import com.ubaya.kost.databinding.FragmentPengeluaranBinding
 import com.ubaya.kost.ui.owner.pembukuan.PembukuanViewModel
+import com.ubaya.kost.util.ThousandSeparator
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.*
 
 class PengeluaranFragment : Fragment() {
 
     private lateinit var pengeluarans: ArrayList<Pengeluaran>
     private lateinit var adapter: PengeluaranAdapter
-    private lateinit var dialogBinding: DialogAddPengeluaranBinding
     private lateinit var dialog: AlertDialog
 
     private var _binding: FragmentPengeluaranBinding? = null
+    private var _dialogBinding: DialogAddPengeluaranBinding? = null
 
     private val binding get() = _binding!!
+    private val dialogBinding get() = _dialogBinding!!
     private val pembukuanViewModel: PembukuanViewModel by viewModels(
         ownerProducer = {
             requireParentFragment()
         }
     )
     private val tz = TimeZone.currentSystemDefault()
-    private val df: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
+    private val df: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,6 +46,7 @@ class PengeluaranFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPengeluaranBinding.inflate(layoutInflater, container, false)
+        _dialogBinding = DialogAddPengeluaranBinding.inflate(layoutInflater, binding.root, false)
 
         return _binding!!.root
     }
@@ -54,10 +58,23 @@ class PengeluaranFragment : Fragment() {
         initView()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        _binding = null
+        _dialogBinding = null
+    }
+
     private fun initView() {
         val layoutManager = LinearLayoutManager(requireContext())
         pengeluarans = arrayListOf()
         adapter = PengeluaranAdapter(pengeluarans)
+        dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Tambah Pengeluaran")
+            .setView(dialogBinding.root)
+            .setPositiveButton("Tambah") { dialog, _ -> addPengeluaran() }
+            .setNegativeButton("Batal") { dialog, _ -> dialog.dismiss() }
+            .create()
 
         binding.pengeluaranRV.adapter = adapter
         binding.pengeluaranRV.layoutManager = layoutManager
@@ -87,17 +104,6 @@ class PengeluaranFragment : Fragment() {
     }
 
     private fun openDialog() {
-        if (!::dialogBinding.isInitialized) {
-            dialogBinding = DialogAddPengeluaranBinding.inflate(layoutInflater, binding.root, false)
-            dialog = MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Tambah Pengeluaran")
-                .setView(dialogBinding.root)
-                .setPositiveButton("Tambah") { dialog, _ -> addPengeluaran() }
-                .setNegativeButton("Batal") { dialog, _ -> dialog.dismiss() }
-                .create()
-        }
-
-
         val today = Clock.System.todayAt(tz).toJavaLocalDate()
         val formattedDate = today.format(df)
         dialogBinding.dialogAddPengeluaranTanggal.setText(formattedDate)
@@ -105,6 +111,10 @@ class PengeluaranFragment : Fragment() {
         dialogBinding.dialogAddPengeluaranNominal.text!!.clear()
         dialogBinding.dialogAddPengeluaranTanggal.setOnClickListener {
             openDatePicker()
+        }
+
+        dialogBinding.dialogAddPengeluaranNominal.apply {
+            addTextChangedListener(ThousandSeparator(this))
         }
         dialog.show()
     }
@@ -130,7 +140,8 @@ class PengeluaranFragment : Fragment() {
     private fun addPengeluaran() {
         val date = dialogBinding.dialogAddPengeluaranTanggal.text.toString()
         val description = dialogBinding.dialogAddPengeluaranDeskripsi.text.toString()
-        val nominal = dialogBinding.dialogAddPengeluaranNominal.text.toString().toInt()
+        val nominal =
+            dialogBinding.dialogAddPengeluaranNominal.text.toString().replace(".", "").toInt()
         pembukuanViewModel.addPengeluaran(date, description, nominal)
     }
 }

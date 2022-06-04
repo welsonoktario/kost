@@ -112,9 +112,8 @@ class TransaksiFragment : Fragment(), TransaksiAdapter.TransaksiListener {
     private fun openDialog(position: Int) {
         var total = 0
         val invoice = transaksiViewModel.transaksis.value?.get(position)!!.invoice!!
-        val tenant = invoice.tenant
 
-        dialogBinding.dialogInvoiceTanggal.text = tenant.tanggalTagihan()
+        dialogBinding.dialogInvoiceTanggal.text = invoice.tanggalTagihan
 
         if (invoice.invoiceDetails.isEmpty()) {
             dialogBinding.dialogInvoiceNull.visibility = View.VISIBLE

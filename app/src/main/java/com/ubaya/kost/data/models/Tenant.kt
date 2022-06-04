@@ -22,7 +22,8 @@ data class Tenant(
     var status: Boolean,
     val ktp: String,
     var user: User,
-    var room: Room? = null
+    var room: Room? = null,
+    var deleted: Boolean = false
 ) : Parcelable {
     fun lamaMenyewa(): Int {
         val entry = LocalDate.parse(entryDate)
