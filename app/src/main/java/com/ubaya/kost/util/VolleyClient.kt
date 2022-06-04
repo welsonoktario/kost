@@ -16,7 +16,7 @@ class VolleyClient(context: Context) {
                 }
             }
 
-        const val BASE_URL = "http://192.168.1.2/kost/public"
+        const val BASE_URL = "http://10.0.2.2/kost/public"
         const val API_URL = "$BASE_URL/api"
     }
 
