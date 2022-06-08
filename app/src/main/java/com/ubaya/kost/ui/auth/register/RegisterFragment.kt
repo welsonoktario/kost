@@ -184,7 +184,16 @@ class RegisterFragment : Fragment(), RoomTypeAdapter.CardJenisClickListener,
                 findNavController().navigate(R.id.action_navigation_register_to_owner_navigation)
             },
             { err ->
-                Log.d("error", err.toString())
+                try {
+                    val data = JSONObject(String(err.networkResponse.data))
+
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setMessage(data.getString("msg"))
+                        .setPositiveButton("OK", null)
+                        .show()
+                } catch (e: Exception) {
+                    Log.d("err", e.message.toString())
+                }
             }
         )
 

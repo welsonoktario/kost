@@ -225,9 +225,6 @@ class AddTenantFragment : Fragment() {
                     MaterialAlertDialogBuilder(requireContext())
                         .setMessage(data.getString("msg"))
                         .setNegativeButton("OK", null)
-                        .setPositiveButton("Coba Lagi") { _, _ ->
-                            addTenant(prepareParams())
-                        }
                         .show()
                 } catch (e: Exception) {
                     MaterialAlertDialogBuilder(requireContext())

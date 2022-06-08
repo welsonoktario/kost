@@ -140,12 +140,14 @@ class DetailTenantFragment : Fragment() {
                     binding.btnTambah.isEnabled = false
                     binding.detailTenantDendaDurasi.visibility = View.GONE
                     binding.detailTenantDendaNominal.visibility = View.GONE
+                    binding.detailTenantCardTagihan.visibility = View.GONE
                     binding.detailTenantDendaNull.visibility = View.VISIBLE
                 }
                 sisaSewa >= 1 -> {
                     binding.detailTenantDue.text = tenant.dueDate
                     binding.btnKonfirm.isEnabled = diffFromDue <= 15
                     binding.btnTambah.isEnabled = true
+                    binding.detailTenantCardTagihan.visibility = View.VISIBLE
                 }
                 lamaMenyewa <= 1 -> {
                     binding.detailTenantDue.text = "-"
@@ -160,8 +162,12 @@ class DetailTenantFragment : Fragment() {
                     binding.btnKonfirm.isEnabled = diffFromDue <= 15
                     binding.btnTambah.isEnabled = true
                 }
-                diffFromDue <= 15 -> binding.btnKonfirm.isEnabled = true
-                diffFromDue > 15 -> binding.btnKonfirm.isEnabled = false
+                diffFromDue <= 15 -> {
+                    binding.btnKonfirm.isEnabled = true
+                }
+                diffFromDue > 15 -> {
+                    binding.btnKonfirm.isEnabled = false
+                }
             }
 
             if (sisaSewa >= 1 && telat >= 1) {

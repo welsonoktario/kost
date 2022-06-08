@@ -128,7 +128,7 @@ class EditServiceFragment : Fragment(), EditServiceAdapter.EditServiceListener {
         dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Tambah") { _, _ ->
             val name = dialogBinding.dialogServiceName.text.toString()
             val description = dialogBinding.dialogServiceDescription.text.toString()
-            val cost = dialogBinding.dialogServiceCost.text.toString().toInt()
+            val cost = dialogBinding.dialogServiceCost.text.toString().replace(".", "").toInt()
 
             servicesViewModel.addService(name, description, cost)
         }
