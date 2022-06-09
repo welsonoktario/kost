@@ -540,7 +540,7 @@ class DetailTenantFragment : Fragment() {
     }
 
     private fun addTagihan() {
-        val nominal = dialogAddTagihanBinding.addTagihanNominal.text.toString().toInt()
+        val nominal = dialogAddTagihanBinding.addTagihanNominal.text.toString().replace(".", "").toInt()
         val deskripsi = dialogAddTagihanBinding.addTagihanDeskripsi.text.toString()
 
         val params = JSONObject()

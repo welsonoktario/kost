@@ -250,6 +250,7 @@ class TenantHomeFragment : Fragment() {
         }
 
         tenantViewModel.total.observe(viewLifecycleOwner) {
+            Log.d("adad", it.toString())
             binding.homeTenantTagihan.text = NumberUtil().rupiah(it)
         }
 
@@ -264,7 +265,6 @@ class TenantHomeFragment : Fragment() {
         tenantViewModel.kost.observeOnce(viewLifecycleOwner) { kost ->
             val lamaMenyewa = tenant.lamaMenyewa()
             val sisaSewa = tenant.sisaSewa()
-            val diffFromDue = tenant.diffFromDue()
             val telat = tenant.telat(kost.dendaBerlaku!!)
 
             if (lamaMenyewa <= 1) {
@@ -289,7 +289,9 @@ class TenantHomeFragment : Fragment() {
             }
 
             if (telat > 1) {
-                tenantViewModel.setTotal(tenantViewModel.total.value!! + tenant.nominalTelat(kost))
+                if (tenantViewModel.total.value == null) {
+                    tenantViewModel.setTotal(tenantViewModel.total.value!! + tenant.nominalTelat(kost))
+                }
             }
 
             if (sisaSewa >= 1) {
