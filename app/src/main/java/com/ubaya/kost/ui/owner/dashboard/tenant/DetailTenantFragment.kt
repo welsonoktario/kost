@@ -24,6 +24,7 @@ import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.databinding.*
 import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
 import com.ubaya.kost.util.NumberUtil
+import com.ubaya.kost.util.ThousandSeparator
 import com.ubaya.kost.util.VolleyClient
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -447,6 +448,10 @@ class DetailTenantFragment : Fragment() {
                     addTagihan()
                 }
             }
+        }
+
+        dialogAddTagihanBinding.addTagihanNominal.apply {
+            addTextChangedListener(ThousandSeparator(this))
         }
 
         dialogAddTagihan.show()
