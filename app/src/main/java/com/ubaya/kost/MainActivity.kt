@@ -48,7 +48,8 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_pembukuan,
                 R.id.fragment_denda,
                 R.id.fragment_transaksi,
-                R.id.fragment_tenant_home
+                R.id.fragment_tenant_home,
+                R.id.fragment_nota
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -71,6 +72,7 @@ class MainActivity : AppCompatActivity(), ImageLoaderFactory {
                 R.id.fragment_tenant_chat_room -> navView.visibility = View.GONE
                 R.id.fragment_tenant_service -> navView.visibility = View.GONE
                 R.id.fragment_nota -> navView.visibility = View.GONE
+                R.id.fragment_jatuh_tempo -> navView.visibility = View.GONE
                 else -> navView.visibility = View.VISIBLE
             }
         }

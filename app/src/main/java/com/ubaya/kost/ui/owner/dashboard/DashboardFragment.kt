@@ -59,6 +59,7 @@ class DashboardFragment : Fragment(), RoomAdapter.RoomListener {
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.itemId) {
+                    R.id.menu_jatuh_tempo -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_jatuh_tempo)
                     R.id.menu_catatan -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_catatan)
                     R.id.menu_komplain -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_komplain)
                     R.id.menu_message -> findNavController().navigate(R.id.action_fragment_dashboard_to_fragment_chats)
