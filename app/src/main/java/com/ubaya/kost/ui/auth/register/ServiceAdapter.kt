@@ -97,7 +97,7 @@ class ServiceAdapter(
                 }
 
                 override fun afterTextChanged(s: Editable?) {
-                    if (s != null && s.toString() != "" && s.isDigitsOnly()) {
+                    if (s != null && s.toString() != "") {
                         binding.cardRegisterServiceLayoutHarga.error = null
                         val newValue = s.toString().replace(".", "").toInt()
                         listener.onHargaServiceChanged(adapterPosition, newValue)

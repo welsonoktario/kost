@@ -24,6 +24,7 @@ import com.ubaya.kost.data.models.Tenant
 import com.ubaya.kost.databinding.*
 import com.ubaya.kost.ui.owner.dashboard.DashboardViewModel
 import com.ubaya.kost.util.NumberUtil
+import com.ubaya.kost.util.ThousandSeparator
 import com.ubaya.kost.util.VolleyClient
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -449,6 +450,10 @@ class DetailTenantFragment : Fragment() {
             }
         }
 
+        dialogAddTagihanBinding.addTagihanNominal.apply {
+            addTextChangedListener(ThousandSeparator(this))
+        }
+
         dialogAddTagihan.show()
     }
 
@@ -535,7 +540,7 @@ class DetailTenantFragment : Fragment() {
     }
 
     private fun addTagihan() {
-        val nominal = dialogAddTagihanBinding.addTagihanNominal.text.toString().toInt()
+        val nominal = dialogAddTagihanBinding.addTagihanNominal.text.toString().replace(".", "").toInt()
         val deskripsi = dialogAddTagihanBinding.addTagihanDeskripsi.text.toString()
 
         val params = JSONObject()
