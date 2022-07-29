@@ -61,13 +61,17 @@ class ServicesViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun updatePengajuanService(position: Int, aksi: String) {
+    fun updatePengajuanService(position: Int, aksi: String, alasan: String? = null) {
         isLoading.value = true
         error.value = Error(false, "")
         val id = _tenantServices.value?.get(position)?.id
         val url = "${VolleyClient.API_URL}/tenant-service/${id}"
         val params = JSONObject()
         params.put("aksi", aksi)
+
+        if (aksi === "ditolak") {
+            params.put("alasan", alasan!!)
+        }
 
         viewModelScope.launch {
             val request = object : JsonObjectRequest(

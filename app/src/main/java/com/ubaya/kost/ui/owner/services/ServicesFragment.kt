@@ -12,6 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ubaya.kost.R
 import com.ubaya.kost.data.models.Error
 import com.ubaya.kost.data.models.TenantService
+import com.ubaya.kost.databinding.DialogAlasanBinding
 import com.ubaya.kost.databinding.FragmentServicesBinding
 
 class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
@@ -20,8 +21,10 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
     private lateinit var adapter: ServicesAdapter
 
     private var _binding: FragmentServicesBinding? = null
+    private var _dialogBinding: DialogAlasanBinding? = null
 
     private val binding get() = _binding!!
+    private val dialogBinding get() = _dialogBinding!!
     private val serviceViewModel by navGraphViewModels<ServicesViewModel>(R.id.mobile_navigation)
 
     override fun onCreateView(
@@ -32,6 +35,7 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
         serviceViewModel.loadPengajuanServices()
 
         _binding = FragmentServicesBinding.inflate(inflater, container, false)
+        _dialogBinding = DialogAlasanBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -95,6 +99,7 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        _dialogBinding = null
     }
 
     override fun onListClick(position: Int) {
@@ -108,13 +113,25 @@ class ServicesFragment : Fragment(), ServicesAdapter.ServicesListener {
                     )
                 }
                 .setNegativeButton("Tolak") { _, _ ->
-                    serviceViewModel.updatePengajuanService(
-                        position,
-                        "ditolak"
-                    )
+                    tolak(position)
                 }
                 .setNeutralButton("Batal", null)
                 .show()
         }
+    }
+
+    private fun tolak(position: Int) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .setMessage("Tolak Service")
+            .setCancelable(false)
+            .setPositiveButton("Kirim") { _, _ ->
+                serviceViewModel.updatePengajuanService(
+                    position,
+                    "ditolak",
+                    dialogBinding.dialogAlasanAlasan.text.toString()
+                )
+            }
+            .show()
     }
 }
